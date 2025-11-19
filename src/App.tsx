@@ -1,16 +1,38 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
-import GatePassIndex from './gate-pass/gate-pass-index'
+import GatePassIndex from './pages/gate-pass/gate-pass-index'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import GatePassCRUD from './pages/gate-pass/new-gate-pass/Voucher-crud'
+import PageTitle from './components/PageTitle'
 
+const queryClient = new QueryClient()
 function App() {
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<GatePassIndex />} />
-        <Route path="/test" element={<GatePassIndex />} />
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          {/* <Route path="/" element={<GatePassIndex />} /> */}
+          <Route path="gate-pass">
+            <Route index element={
+              <>
+                <PageTitle title="Gate-pass" />
+                <GatePassIndex />
+              </>
+            }
+            />
+            <Route
+              path=":pageAction/:id"
+              element={
+                <>
+                  <PageTitle title="Gate-pass Crud" />
+                  <GatePassCRUD />
+                </>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 
