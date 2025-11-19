@@ -17,12 +17,12 @@ type props = {
 export default function AppFormAction({ pageAction, mutationIsPending, isLoading, isPopup, form, navigationLink, children }: props) {
     return (
         <div className="flex justify-between">
-            <div className="flex gap-2">
-                <AppSaveButton pageAction={pageAction} mutationIsPending={mutationIsPending} isLoading={isLoading} />
-                <AppCancelButton pageAction={pageAction} isPending={mutationIsPending} form={form} />
-                {children}
-            </div>
             <AppBackButton mutationIsPending={mutationIsPending} navigationLink={navigationLink} isPopup={isPopup} />
+            <div className="flex gap-2">
+                {children}
+                <AppCancelButton pageAction={pageAction} isPending={mutationIsPending} form={form} />
+                <AppSaveButton pageAction={pageAction} mutationIsPending={mutationIsPending} isLoading={isLoading} />
+            </div>
         </div>
     )
 }

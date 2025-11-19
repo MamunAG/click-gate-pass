@@ -2,14 +2,15 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BsExclamationTriangle } from 'react-icons/bs';
 import { useParams } from 'react-router';
-import VoucherForm from './Voucher-form';
+import GatePassForm from './gate-pass-form';
 import { PageAction } from '@/utility/page-actions';
-import { GetVoucherById, type IVoucher } from '@/actions/accounting/voucher-action';
 import useAxiosInstance from '@/lib/axios-instance';
 import React from 'react';
 import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
 import { AppSheet } from '@/components/AppSheet';
 import TaxForm from '@/pages/Tax/Tax-form';
+import type { IGatePassSaveDto } from '../dto/gate-pass-save.dto';
+import { GetGatePassById } from '../gate-pass.service';
 // import AccountForm from '../Account/Account-form';
 // import SupplierForm from '@/pages/Configuration/Supplier/Supplier-form';
 // import MasterLCForm from '../MasterLC/MasterLC-form';
@@ -58,7 +59,7 @@ function TaxSetupFormSheet() {
 
 export default function GatePassCRUD() {
     const axios = useAxiosInstance();
-    const [voucher, setVoucher] = React.useState<IVoucher | undefined>();
+    const [voucher, setVoucher] = React.useState<IGatePassSaveDto | undefined>();
     const [isLoading, setIsLoading] = React.useState(false);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
@@ -69,7 +70,7 @@ export default function GatePassCRUD() {
             try {
                 setIsLoading(true);
 
-                await GetVoucherById(axios, Number(id))
+                await GetGatePassById(axios, Number(id))
                     .then((res) => {
                         if (res.IsError) {
                             console.log("Error found: ", res.Errors);
@@ -126,7 +127,7 @@ export default function GatePassCRUD() {
                 </BreadcrumbAddNew>
 
                 <div className="flex flex-col gap-10">
-                    <VoucherForm data={voucher} pageAction={PageAction.view} />
+                    <GatePassForm data={voucher} pageAction={PageAction.view} />
                 </div>
             </>
 
@@ -143,7 +144,7 @@ export default function GatePassCRUD() {
                 </BreadcrumbAddNew>
 
                 <div className="flex flex-col gap-10">
-                    <VoucherForm data={voucher} pageAction={PageAction.add} />
+                    <GatePassForm data={voucher} pageAction={PageAction.add} />
                 </div>
             </>
         );
@@ -159,7 +160,7 @@ export default function GatePassCRUD() {
                 </BreadcrumbAddNew>
 
                 <div className="flex flex-col gap-10">
-                    <VoucherForm data={voucher} pageAction={PageAction.edit} />
+                    <GatePassForm data={voucher} pageAction={PageAction.edit} />
                 </div>
             </>
 
@@ -172,7 +173,7 @@ export default function GatePassCRUD() {
                 </BreadcrumbAddNew>
 
                 <div className="flex flex-col gap-10">
-                    <VoucherForm data={voucher} pageAction={PageAction.delete} />
+                    <GatePassForm data={voucher} pageAction={PageAction.delete} />
                 </div>
             </>
         );

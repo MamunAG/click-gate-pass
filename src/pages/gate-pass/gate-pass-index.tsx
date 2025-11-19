@@ -1,8 +1,8 @@
-import { GatePassTable } from './index-page-components/gate-pass-table'
-import GatePassIndexForm, { type formIndexType } from './index-page-components/gate-pass-index-form'
-import { GatePassData } from './index-page-components/gate-pass.data';
+import { GatePassTable } from './index-page/gate-pass-table'
+import GatePassIndexForm, { type formIndexType } from './index-page/gate-pass-index-form'
+import { GatePassData } from './index-page/gate-pass.data';
 import React from 'react';
-import type { IGatePassIndex } from './index-page-components/gate-pass.dto';
+import type { IGatePassIndex } from './index-page/gate-pass.dto';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
 import { PageAction } from '@/utility/page-actions';

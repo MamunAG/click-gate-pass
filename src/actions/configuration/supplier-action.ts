@@ -35,12 +35,11 @@ export async function GetAllsupplier(axios: AxiosInstance) {
 }
 
 export function GetAllActivesupplier() {
-    const companyId = localStorage.getItem(localStorageKey.selectedCompany);
+    // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
     const axios = useAxiosInstance();
 
-    const getData = async (): Promise<IApiResponseType<SupplierType[]>> =>
-        (await axios.get(`/${companyId}/supplier?IsActive=true`)).data;
-
+    const getData = async (): Promise<SupplierType[]> =>
+        (await axios.get(`/production/Supplier/GetAllSupplier`)).data;
     const query = useQuery({
         queryKey: [ReactQueryKey.Supplier],
         queryFn: getData,

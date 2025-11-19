@@ -1,4 +1,4 @@
-import { GetAllTax, TaxType } from "@/actions/accounting/tax-action";
+import { GetAllTax, type TaxType } from "@/actions/accounting/tax-action";
 import useAxiosInstance from "@/lib/axios-instance";
 import { PageAction } from "@/utility/page-actions";
 import { Edit2 } from "lucide-react";

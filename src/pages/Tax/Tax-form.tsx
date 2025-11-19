@@ -49,7 +49,6 @@ const formSchema = z.object({
 type AccountTypeFormSchema = z.infer<typeof formSchema>;
 
 export default function TaxForm({
-    data,
     pageAction,
     isPopup,
 }: {

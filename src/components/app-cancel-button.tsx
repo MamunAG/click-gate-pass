@@ -22,7 +22,7 @@ export default function AppCancelButton({ pageAction, isPending, form }: props) 
             className={cn(
                 "w-24",
                 pageAction === PageAction.view ? "hidden" : "",
-                pageAction === PageAction.delete ? "hidden" : ""
+                pageAction === PageAction.delete ? "hidden" : "", 'cursor-pointer'
             )}
             size={"sm"}
         >

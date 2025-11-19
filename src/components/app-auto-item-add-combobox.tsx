@@ -12,21 +12,38 @@ type props = {
     text: string,
     textFieldName: string,
     valueFieldName: string,
-    selectItems: SelectItemType[],
+    selectItems?: any[],
     onSelectCommandItem?: () => void,
     onClickXButton?: () => void,
     isShowText?: boolean,
     align?: 'vertical' | 'horizontal',
     labelCSS?: string,
+    selectItemsValueFieldName?: string,
+    selectItemsLabelFieldName?: string
+
 }
 
-export default function AppAutoItemAddCombobox(
-    { text, isShowText = true, textFieldName, valueFieldName, form, selectItems, onSelectCommandItem, onClickXButton, align = 'vertical', labelCSS = "w-16" }: props) {
+export default function AppAutoItemAddCombobox({
+    text,
+    isShowText = true,
+    textFieldName,
+    valueFieldName,
+    form,
+    selectItems,
+    selectItemsValueFieldName = 'value',
+    selectItemsLabelFieldName = 'label',
+    onSelectCommandItem,
+    onClickXButton,
+    align = 'vertical',
+    labelCSS = "w-16" }: props) {
 
     const [openParty, setOpenParty] = React.useState(false)
     const [Parties, setParties] = React.useState<SelectItemType[]>([])
     React.useEffect(() => {
-        setParties(selectItems);
+        const seItems = selectItems?.map((item: any) => {
+            return { label: item[selectItemsLabelFieldName], value: item[selectItemsValueFieldName].toString() }
+        })
+        setParties(seItems ?? []);
     }, [selectItems])
 
     return (

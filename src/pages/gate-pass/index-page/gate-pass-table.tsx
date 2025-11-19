@@ -180,6 +180,7 @@ export function GatePassTable({ data }: { data: IGatePassIndex[] }) {
             columnVisibility,
             rowSelection,
         },
+
     })
 
     return (

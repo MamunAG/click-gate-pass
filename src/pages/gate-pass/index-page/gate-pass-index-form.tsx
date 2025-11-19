@@ -133,7 +133,7 @@ export default function GatePassIndexForm({ handleIndexFormSubmit }: { handleInd
             />
           </div>
 
-          <Button type="submit" className="cursor-pointer">Submit</Button>
+          <Button type="submit" className="cursor-pointer">Search</Button>
         </div>
 
       </form>

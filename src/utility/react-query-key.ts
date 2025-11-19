@@ -22,5 +22,8 @@ export const ReactQueryKey = {
     VoucherTypes: 'VoucherTypes',
     Role: 'Role',
     User: 'User',
+    GmtTypes: 'GmtTypes',
+    GatepassEmployee: 'GatepassEmployee',
+    GatepassDept: 'GatepassDept'
 
 };

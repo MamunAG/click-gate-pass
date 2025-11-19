@@ -1,21 +1,30 @@
-// import { useQuery } from "@tanstack/react-query";
-// import useAxiosInstance from "@/lib/axios-instance";
-// import { ReactQueryKey } from "@/utility/react-query-key";
-import type { AxiosInstance } from "axios";
-// import type { IApiResponseType } from "../api-response-type";
-// import { localStorageKey } from "@/lib/auth-provider";
-
-// import { localStorageKey } from "@/lib/auth-provider";
+import useAxiosInstance from "@/lib/axios-instance";
+import { ReactQueryKey } from "@/utility/react-query-key";
+import { useQuery } from "@tanstack/react-query";
 
 export interface IGmtType {
     id: number,
     name: string
 };
 
-export async function GetAllDepartment(axios: AxiosInstance) {
+// export async function GetAllDepartment(axios: AxiosInstance) {
+//     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
+//     const response = await axios.get(`/production/gatepass/get-all-department`);
+//     return response.data;
+// }
+export function GetAllDepartment() {
     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-    const response = await axios.get(`/production/gatepass/get-all-department`);
-    return response.data;
+    const axios = useAxiosInstance();
+
+    const getData = async (): Promise<IGmtType[]> =>
+        (await axios.get(`/production/gatepass/get-all-department`)).data;
+    const query = useQuery({
+        queryKey: [ReactQueryKey.GatepassDept],
+        queryFn: getData,
+        staleTime: 1000 * 10,
+    });
+
+    return query;
 }
 
 // export function GetAllActiveCountry() {

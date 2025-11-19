@@ -6,14 +6,8 @@ import { AxiosError } from "axios";
 
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
-import {
-    type IVoucher,
-    Delete,
-    Save,
-    Update,
-} from "@/actions/accounting/voucher-action";
+
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
     Form,
     FormControl,
@@ -26,38 +20,34 @@ import { Input } from "@/components/ui/input";
 import useAxiosInstance from "@/lib/axios-instance";
 import { cn } from "@/lib/utils";
 import { PageAction } from "@/utility/page-actions";
-import { ReactQueryKey } from "@/utility/react-query-key";
 import { z } from "zod";
 import AppPageContainer from "@/components/AppPageContainerProps";
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GetAllActivePaymentMethod } from "@/actions/accounting/payment-method-action";
 import { toast } from "sonner";
-import { GetAllActiveChartOfAccount } from "@/actions/accounting/account-action";
 import { GetAllActivesupplier } from "@/actions/configuration/supplier-action";
-import { GetAllActiveTax, GetTaxById } from "@/actions/accounting/tax-action";
-import { GetAllActivePaymentTerms } from "@/actions/accounting/payment-terms-action";
 import type { IApiResponseType } from "@/actions/api-response-type";
 import AppInput from "@/components/app-input";
 import AppAutoItemAddCombobox from "@/components/app-auto-item-add-combobox";
 import AppDate from "@/components/app-date";
 import AppFormAction from "@/components/app-form-action";
 import { PlusCircle, Trash2 } from "lucide-react";
-import { GetAllActiveIVoucherType } from "@/actions/accounting/voucher-type-action";
-import { GetAllActiveMasterLC } from "@/actions/accounting/master-lc-action";
-import { PaymentVoucherType } from "./components/voucher-types";
-import { GetAllActivecurrency } from "@/actions/configuration/currency-action";
 import useApiUrl from "@/hooks/use-ApiUrl";
 import { localStorageKey } from "@/lib/auth-provider";
 import moment from "moment";
-import type { SelectItemType } from "@/types/selectItemType";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
+import { Delete, GetAllBuyer, Save, Update } from "../gate-pass.service";
+import { GetAllItemTypes } from "@/actions/store/item-type-action";
+import { GetAllGmtTypes } from "@/actions/store/gmt-type-action";
+import { GetAllGatePassEmp } from "@/actions/store/gate-pass-emp-action";
+import { GetAllDepartment } from "@/actions/store/department-action";
+import { GetAllUom } from "@/actions/store/uom-action";
 
-
-const voucherDetailsSchema = z.object({
+const GatepassDetailsSchema = z.object({
     Id: z.number(),
-    // VoucherId: z.coerce.number(),
-    // VouchersNo: z.string().nullable().optional(),
+    // GatepassId: z.coerce.number(),
+    // GatepasssNo: z.string().nullable().optional(),
     // AccountId: z.coerce.number(),
     // AccountName: z.string(),
     // DebitAmount: z.coerce.number(),
@@ -67,222 +57,69 @@ const voucherDetailsSchema = z.object({
 
 const formSchema = z.object({
     Id: z.number(),
-    VoucherNo: z.string().min(1),
-    // VoucherDate: z.coerce.date(),
-    // TransactionTypeId: z.coerce.number(),
-    // TransactionTypeName: z.string().nullable().optional(),
-    // Amount: z.coerce.number(),
-    // PaymentMethodId: z.coerce.number().optional(),
-    // PaymentMethodName: z.string().nullable().optional(),
-    // PaymentTermsId: z.coerce.number().optional(),
-    // PaymentTermsName: z.string().nullable().optional(),
-    // ChequeNumber: z.string().optional(),
-    // ChequeDate: z.coerce.date().optional().nullable(),
-    // TaxId: z.coerce.number().optional(),
-    // TaxName: z.string().nullable().optional(),
-    // PartyId: z.coerce.number().optional(),
-    // PartyName: z.string().nullable().optional(),
-    // ProjectId: z.coerce.number().optional(),
-    // ProjectName: z.string().nullable().optional(),
-
-    // master_lc_id: z.coerce.number().optional(),
-    // master_lc_number: z.string().nullable().optional(),
-
-    // voucher_type_id: z.coerce.number().optional(),
-    // voucher_type_name: z.string().nullable().optional(),
-
-    // currency_id: z.coerce.number().optional(),
-    // currency_name: z.string().nullable().optional(),
-    // currency_exchange_rate_bdt: z.coerce.number().optional().default(0),
-
-    // Description: z.string(),
-
-    // bb_lc_no: z.string().optional(),
-    // tt_no: z.string().optional(),
-
-    VoucherDetails: z.array(voucherDetailsSchema),
+    gatepassNo: z.string().min(1),
+    date: z.date(),
+    itemTypeId: z.number(),
+    gmtTypeId: z.number(),
+    gatePassTypeId: z.number(),
+    senderName: z.string(),
+    carriedBy: z.string(),
+    departmentId: z.number(),
+    supplierName: z.string().nullable().optional(),
+    supplierId: z.number().optional(),
+    details: z.array(GatepassDetailsSchema),
 });
 
-type VoucherFormSchema = z.infer<typeof formSchema>;
+type GatepassFormSchema = z.infer<typeof formSchema>;
 
-export default function VoucherForm({
+export default function GatePassForm({
     data,
     pageAction
 }: {
-    data: IVoucher | undefined;
+    data: IGatePassSaveDto | undefined;
     pageAction: string;
 }) {
-    // console.log("gauge: ", data);
+    const { GatepassType } = useParams();
+    console.log('GatepassType', GatepassType);
 
-    const { voucherType } = useParams();
-    console.log('voucherType', voucherType);
-
-    const [Errors, setErrors] = React.useState<string[] | null>([]);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-    const [taxPercentage, setTaxPercentage] = React.useState<number | null>(null);
-    const [chequeInputVisible, setChequeInputVisible] = React.useState<boolean>(data?.PaymentMethodName === 'Cheque' ? true : false);
-    const [bblcInputVisible, setBBLCInputVisible] = React.useState<boolean>(data?.PaymentMethodName === 'LC' ? true : false);
-    const [ttInputVisible, setTTInputVisible] = React.useState<boolean>(data?.PaymentMethodName === 'TT' ? true : false);
-    const [ChartOfAccounts, setChartOfAccounts] = React.useState<SelectItemType[]>([])
-    const [PaymentMethods, setPaymentMethods] = React.useState<SelectItemType[]>([])
-    const [PaymentTerms, setPaymentTerms] = React.useState<SelectItemType[]>([])
-    const [Parties, setParties] = React.useState<SelectItemType[]>([])
-    const [voucherTypes, setVoucherTypes] = React.useState<SelectItemType[]>([])
-    const [masterLCs, setMasterLCs] = React.useState<SelectItemType[]>([])
-    const [currencies, setCurrencies] = React.useState<SelectItemType[]>([])
-
-    const [Taxs, setTaxs] = React.useState<SelectItemType[]>([])
-
-    const queryClient = useQueryClient();
     const navigator = useNavigate();
     const axios = useAxiosInstance();
     const api = useApiUrl();
     console.log(api)
 
-    const { data: paymentMethodsData } = GetAllActivePaymentMethod();
-    const { data: paymentTermsData } = GetAllActivePaymentTerms();
+    const itemTypesData = GetAllItemTypes();
+    const { data: gmtTypesData } = GetAllGmtTypes();
+    const gatePassTypesData = [{ label: 'Returnable', value: 'Returnable' }, { label: 'Not Returnable', value: 'Not Returnable' }];
     const { data: partysData } = GetAllActivesupplier();
-    const { data: chartOfAccountsData } = GetAllActiveChartOfAccount();
-    const { data: taxData } = GetAllActiveTax();
-    const { data: voucherTypeData } = GetAllActiveIVoucherType();
-    const { data: masterLCData } = GetAllActiveMasterLC();
-    const { data: currencyData } = GetAllActivecurrency();
+    const { data: empolyessData } = GetAllGatePassEmp();
+    const { data: departmentData } = GetAllDepartment();
+    const { data: uomData } = GetAllUom();
+    const { data: buyerData } = GetAllBuyer();
 
-    console.log("gauge: ", Errors);
-    console.log("currencies: ", currencies);
-
-    React.useEffect(() => {
-        if (data && (data.TaxId ?? 0) > 0) { getTaxDetails(data.TaxId!); }
-        getCurrencyExchangeRate(1);
-    }, [])
-
-    React.useEffect(() => {
-        if (currencyData?.IsError) {
-            setErrors(currencyData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            currencyData?.Data?.forEach((element: any) => {
-                _.push({ label: `${element.code}`, value: element.id.toString() });
-            });
-
-            setCurrencies([..._]);
-        }
-    }, [currencyData])
-
-    React.useEffect(() => {
-        if (masterLCData?.IsError) {
-            setErrors(masterLCData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            masterLCData?.Data?.forEach((element: any) => {
-                _.push({ label: `${element.master_lc_no}`, value: element.id.toString() });
-            });
-
-            setMasterLCs([..._]);
-        }
-    }, [masterLCData])
-
-    React.useEffect(() => {
-        if (chartOfAccountsData?.IsError) {
-            setErrors(chartOfAccountsData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            chartOfAccountsData?.Data?.forEach((element: any) => {
-                _.push({ label: `${element.Name} || ${element.AccountTypeName}`, value: element.Id.toString() });
-            });
-
-            setChartOfAccounts([..._]);
-        }
-    }, [chartOfAccountsData])
-
-    React.useEffect(() => {
-        if (voucherTypeData?.IsError) {
-            setErrors(voucherTypeData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            voucherTypeData?.Data?.forEach((element: any) => {
-                _.push({ label: `${element.Name}`, value: element.Id.toString() });
-            });
-
-            setVoucherTypes([..._]);
-        }
-    }, [voucherTypeData])
-
-    React.useEffect(() => {
-        if (paymentMethodsData?.IsError) {
-            setErrors(paymentMethodsData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            paymentMethodsData?.Data?.forEach((element: any) => {
-                _.push({ label: element.Name, value: element.Id.toString() });
-            });
-
-            setPaymentMethods([..._]);
-        }
-    }, [paymentMethodsData])
-
-    React.useEffect(() => {
-        if (paymentTermsData?.IsError) {
-            setErrors(paymentTermsData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            paymentTermsData?.Data?.forEach((element: any) => {
-                _.push({ label: element.Name, value: element.Id.toString() });
-            });
-
-            setPaymentTerms([..._]);
-        }
-    }, [paymentTermsData])
-
-
-    React.useEffect(() => {
-        if (partysData?.IsError) {
-            setErrors(partysData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            partysData?.Data?.forEach((element: any) => {
-                _.push({ label: element.Name, value: element.Id.toString() });
-            });
-
-            setParties([..._]);
-        }
-    }, [partysData])
-
-    React.useEffect(() => {
-        if (taxData?.IsError) {
-            setErrors(taxData.Errors);
-        } else {
-            const _: SelectItemType[] = [];
-            taxData?.Data?.forEach((element: any) => {
-                _.push({ label: element.Name, value: element.Id.toString() });
-            });
-
-            setTaxs([..._]);
-        }
-    }, [taxData])
 
     const mutation = useMutation({
-        mutationFn: (tag: IVoucher) => {
+        mutationFn: (tag: IGatePassSaveDto) => {
             if (pageAction === PageAction.add) {
                 return Save(tag, axios);
             } else if (pageAction === PageAction.edit) {
                 return Update(tag, axios);
             } else if (pageAction === PageAction.delete) {
-                return Delete(tag.Id!, axios);
+                return Delete(tag.id!, axios);
             } else {
                 throw new Error("Page Action no found.");
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [ReactQueryKey.AccountVoucher],
-            });
-            navigator(`/voucher/${voucherType}`);
+            // queryClient.invalidateQueries({
+            //     queryKey: [ReactQueryKey.AccountGatepass],
+            // });
+            navigator(`/Gatepass/${GatepassType}`);
         },
         onError: (err: AxiosError) => {
             console.log('error', err.response?.data);
-            const res = err.response?.data as IApiResponseType<IVoucher>;
+            const res = err.response?.data as IApiResponseType<IGatePassSaveDto>;
             // if (res?.IsError) {
             //     setErrors(res?.Errors);
             // }
@@ -302,51 +139,34 @@ export default function VoucherForm({
     });
 
     // 1. Define your form.
-    const form = useForm<VoucherFormSchema>({
+    const form = useForm<GatepassFormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            Id: data?.Id ?? 0,
-            VoucherNo: data?.VoucherNo ?? '',
-            // VoucherDate: data?.VoucherDate,
-            // TransactionTypeId: data?.TransactionTypeId,
-            // TransactionTypeName: data?.TransactionTypeName,
-            // Amount: data?.Amount,
-            // PaymentMethodId: data?.PaymentMethodId,
-            // PaymentMethodName: data?.PaymentMethodName,
-            // PaymentTermsId: data?.PaymentTermsId,
-            // PaymentTermsName: data?.PaymentTermsName,
-            // ChequeNumber: data?.ChequeNumber ?? '',
-            // ChequeDate: data?.ChequeDate,
-            // TaxId: data?.TaxId,
-            // TaxName: data?.TaxName,
-            // PartyId: data?.PartyId,
-            // PartyName: data?.PartyName ?? '',
-            // ProjectId: data?.ProjectId,
-            // ProjectName: data?.ProjectName ?? '',
-            // Description: data?.Description ?? '',
-            // master_lc_id: data?.master_lc_id,
-            // master_lc_number: data?.master_lc_number ?? '',
-            // voucher_type_id: data?.voucher_type_id ?? (voucherType == 'Payment Voucher' ? 1 : 2),
-            // voucher_type_name: data?.voucher_type_name,
-            // bb_lc_no: data?.bb_lc_no ?? '',
-            // tt_no: data?.tt_no ?? '',
-            // currency_id: data?.currency_id ?? 1,
-            // currency_name: data?.currency_name ?? 'BDT',
-            // currency_exchange_rate_bdt: data?.currency_exchange_rate_bdt,
-
-            VoucherDetails: data?.VoucherDetails,
+            Id: data?.id ?? 0,
+            gatepassNo: 'Gate-pass-001',
+            date: data?.date ?? undefined,
+            itemTypeId: data?.itemTypeId ?? 0,
+            gmtTypeId: data?.gmtTypeId ?? 0,
+            gatePassTypeId: data?.gatePassTypeId ?? 0,
+            senderName: data?.senderName ?? '',
+            carriedBy: data?.carriedBy ?? '',
+            departmentId: data?.departmentId ?? 0,
+            supplierName: data?.supplierName ?? '',
+            supplierId: data?.supplierId ?? 0,
+            details: []
         },
     });
 
     const { control, handleSubmit } = form;
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "VoucherDetails",
+        name: "details",
     });
 
     // 2. Define a submit handler.
-    function onSubmit(values: VoucherFormSchema) {
+    function onSubmit(values: GatepassFormSchema) {
         console.log('submit', values);
+        alert(JSON.stringify(values));
         // mutation.mutate(values);
     }
 
@@ -366,7 +186,7 @@ export default function VoucherForm({
                     return [`${fullKey}: ${(value as { message: string }).message}`];
                 }
 
-                // Array errors (like VoucherDetails[0])
+                // Array errors (like GatepassDetails[0])
                 if (Array.isArray(value)) {
                     return value.flatMap((item, index) =>
                         extractMessages(item, `${fullKey}[${index}]`)
@@ -396,31 +216,31 @@ export default function VoucherForm({
     };
 
     async function getTaxDetails(id: number) {
-        setIsLoading(true);
-        const tax = await GetTaxById(axios, id);
+        // setIsLoading(true);
+        // const tax = await GetTaxById(axios, id);
 
-        if (tax.IsError) {
-            toast("Message", {
-                position: "top-center",
-                description: (
-                    <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4 overflow-auto">
-                        <code className="text-white text-sm">
-                            {tax.Errors.join("\n")}
-                        </code>
-                    </pre>
-                ),
-            })
-        } else {
-            setTaxPercentage(tax?.Data?.Percentage);
-        }
-        setIsLoading(false);
+        // if (tax.IsError) {
+        //     toast("Message", {
+        //         position: "top-center",
+        //         description: (
+        //             <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4 overflow-auto">
+        //                 <code className="text-white text-sm">
+        //                     {tax.Errors.join("\n")}
+        //                 </code>
+        //             </pre>
+        //         ),
+        //     })
+        // } else {
+        //     // setTaxPercentage(tax?.Data?.Percentage);
+        // }
+        // setIsLoading(false);
     }
 
     const handleOnAddRowClick = () => {
         append({
             Id: 0,
-            // VoucherId: 0,
-            // VouchersNo: form.getValues("VoucherNo"),
+            // GatepassId: 0,
+            // GatepasssNo: form.getValues("gatepassNo"),
             // AccountId: 0,
             // AccountName: '',
             // DebitAmount: 0,
@@ -454,11 +274,32 @@ export default function VoucherForm({
         <AppPageContainer>
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
-                    <div className="min-w-full flex flex-col flex-wrap gap-2 justify-between">
-                        {/* Voucher Master */}
+                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={`/gate-pass`}>
+                        <Button
+                            type="button"
+                            disabled={mutation.isPending}
+                            onClick={() => {
+                                const url = `/Gatepass/Gatepass-report?id=${data?.id}&GatepassType=paymentRcv`;
+                                window.open(url, "_blank");
+                            }}
+                            variant={"outline"}
+                            className={cn(
+                                "w-auto bg-white text-green-600 border border-green-600",
+                                "hover:bg-green-200",
+                                "w-28", 'cursor-pointer'
+                            )}
+                            size={"sm"}
+                        >
+                            Report
+                        </Button>
+
+                    </AppFormAction>
+
+                    <div className="min-w-full flex flex-col flex-wrap gap-2 justify-between mt-5">
+                        {/* Gate-pass Master */}
                         <div className="w-full flex flex-wrap">
                             <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-3 py-2">
-                                {/* Voucher Id */}
+                                {/* Gate-pass Id */}
                                 <FormField
                                     control={form.control}
                                     name="Id"
@@ -473,19 +314,19 @@ export default function VoucherForm({
                                     )}
                                 />
 
-                                {/* Voucher No */}
-                                <AppInput form={form} name={"VoucherNo"} text={"Voucher No"} disabled={true} align="horizontal" labelCSS="w-32" />
+                                {/* Gate-pass No */}
+                                <AppInput form={form} name={"gatepassNo"} text={"Gatepass No"} disabled={true} align="horizontal" labelCSS="w-32" />
 
-                                {/* VoucherDate */}
-                                <AppDate form={form} name={"VoucherDate"} text={"Voucher Date"} align="horizontal" labelCSS="w-32" />
+                                {/* date */}
+                                <AppDate form={form} name={"date"} text={"Gatepass Date"} align="horizontal" labelCSS="w-32" />
 
                                 {/* Amount */}
                                 {/* <AppInput form={form} name={"Amount"} text={"Amount"} align="horizontal" labelCSS="w-32"
                                     onBlur={() => {
-                                        const items = form.getValues("VoucherDetails");
+                                        const items = form.getValues("GatepassDetails");
                                         items.forEach((_, index) => {
-                                            form.setValue(`VoucherDetails.${index}.DebitAmount`, form.getValues(`VoucherDetails.${index}.IsDebitAccount`) ? form.getValues("Amount") : 0);
-                                            form.setValue(`VoucherDetails.${index}.CreditAmount`, form.getValues(`VoucherDetails.${index}.IsDebitAccount`) ? 0 : form.getValues("Amount"));
+                                            form.setValue(`GatepassDetails.${index}.DebitAmount`, form.getValues(`GatepassDetails.${index}.IsDebitAccount`) ? form.getValues("Amount") : 0);
+                                            form.setValue(`GatepassDetails.${index}.CreditAmount`, form.getValues(`GatepassDetails.${index}.IsDebitAccount`) ? 0 : form.getValues("Amount"));
                                         });
 
                                     }}
@@ -545,7 +386,7 @@ export default function VoucherForm({
                                     }}
                                     align="horizontal" labelCSS="w-32"
                                 /> */}
-                                <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", chequeInputVisible ? '' : 'hidden')}>
+                                {/* <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", chequeInputVisible ? '' : 'hidden')}>
                                     <AppInput form={form} name={"ChequeNumber"} text={"Cheque No"} className="flex-1" />
                                     <div className="min-w-40">
                                         <AppDate form={form} name={"ChequeDate"} text={"Cheque Date*"} />
@@ -556,7 +397,7 @@ export default function VoucherForm({
                                 </div>
                                 <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", ttInputVisible ? '' : 'hidden')}>
                                     <AppInput form={form} name={"tt_no"} text={"TT No"} className="flex-1" />
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-3 py-2">
@@ -573,10 +414,12 @@ export default function VoucherForm({
                                 {/* Party */}
                                 <AppAutoItemAddCombobox
                                     form={form}
-                                    text={"Party"}
-                                    textFieldName={"PartyName"}
-                                    valueFieldName={"PartyId"}
-                                    selectItems={Parties}
+                                    text={"Supplier"}
+                                    textFieldName={"supplierName"}
+                                    valueFieldName={"supplierId"}
+                                    selectItems={partysData}
+                                    selectItemsLabelFieldName="Name"
+                                    selectItemsValueFieldName="Id"
                                     align="horizontal"
                                     labelCSS="w-32"
                                 />
@@ -624,13 +467,13 @@ export default function VoucherForm({
                                         <AppInput form={form} name={"currency_exchange_rate_bdt"} text="Ex.R" placeholder={"Exchange Rate"} align="horizontal" />
                                     </div>
                                 </div>
-                                {/* Voucher Type */}
+                                {/* Gatepass Type */}
                                 {/* <AppFormCombobox
-                                    text="Voucher Type"
-                                    textFieldName="voucher_type_name"
-                                    valueFieldName="voucher_type_id"
+                                    text="Gatepass Type"
+                                    textFieldName="Gatepass_type_name"
+                                    valueFieldName="Gatepass_type_id"
                                     form={form}
-                                    selectItems={voucherTypes}
+                                    selectItems={GatepassTypes}
                                     align="horizontal"
                                     labelCSS="w-32"
                                 /> */}
@@ -638,10 +481,10 @@ export default function VoucherForm({
 
                         </div>
 
-                        {/* Dynamic VoucherDetails */}
+                        {/* Dynamic GatepassDetails */}
                         <div className="space-y-4 border rounded p-4 w-full">
                             <div className="flex flex-wrap justify-between items-center">
-                                <h4 className="text-base font-semibold text-black">Voucher Details</h4>
+                                <h4 className="text-base font-semibold text-black">Gatepass Details</h4>
                                 <Button
                                     variant={"outline"}
                                     type="button"
@@ -668,21 +511,21 @@ export default function VoucherForm({
                                             <TableCell className="font-medium">
                                                 {/* <AppFormCombobox
                                                     form={form}
-                                                    textFieldName={`VoucherDetails.${index}.AccountName`}
-                                                    valueFieldName={`VoucherDetails.${index}.AccountId`}
+                                                    textFieldName={`GatepassDetails.${index}.AccountName`}
+                                                    valueFieldName={`GatepassDetails.${index}.AccountId`}
                                                     selectItems={ChartOfAccounts}
                                                     text="" /> */}
                                             </TableCell>
                                             <TableCell>
-                                                <AppInput form={form} name={`VoucherDetails.${index}.DebitAmount`} text={""} inputTextAlign="text-center" />
+                                                <AppInput form={form} name={`GatepassDetails.${index}.DebitAmount`} text={""} inputTextAlign="text-center" />
                                             </TableCell>
                                             <TableCell>
-                                                <AppInput form={form} name={`VoucherDetails.${index}.CreditAmount`} text={""} inputTextAlign="text-center" />
+                                                <AppInput form={form} name={`GatepassDetails.${index}.CreditAmount`} text={""} inputTextAlign="text-center" />
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {/* <FormField
                                                     control={control}
-                                                    name={`VoucherDetails.${index}.IsDebitAccount`}
+                                                    name={`GatepassDetails.${index}.IsDebitAccount`}
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <div className="flex gap-2 justify-center items-center">
@@ -719,42 +562,7 @@ export default function VoucherForm({
                             </Table>
                         </div>
                     </div>
-                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={`/gate-pass/${voucherType}`}>
-                        {voucherType === PaymentVoucherType ?
-                            <Button
-                                type="button"
-                                disabled={mutation.isPending}
-                                onClick={() => {
-                                    const url = `/voucher/voucher-report?id=${data?.Id}&voucherType=payment`;
-                                    window.open(url, "_blank");
-                                }}
-                                variant={"outline"}
-                                className={cn(
-                                    "w-auto bg-white text-green-600 border border-green-600",
-                                    "hover:bg-green-500 hover:text-white"
-                                )}
-                                size={"sm"}
-                            >
-                                Payment Voucher
-                            </Button> :
-                            <Button
-                                type="button"
-                                disabled={mutation.isPending}
-                                onClick={() => {
-                                    const url = `/voucher/voucher-report?id=${data?.Id}&voucherType=paymentRcv`;
-                                    window.open(url, "_blank");
-                                }}
-                                variant={"outline"}
-                                className={cn(
-                                    "w-auto bg-white text-green-600 border border-green-600",
-                                    "hover:bg-green-500 hover:text-white"
-                                )}
-                                size={"sm"}
-                            >
-                                Receive Voucher
-                            </Button>
-                        }
-                    </AppFormAction>
+
                 </form>
             </Form>
         </AppPageContainer>

@@ -1,21 +1,38 @@
 // import { useQuery } from "@tanstack/react-query";
 // import useAxiosInstance from "@/lib/axios-instance";
 // import { ReactQueryKey } from "@/utility/react-query-key";
-import type { AxiosInstance } from "axios";
+import useAxiosInstance from "@/lib/axios-instance";
+import { ReactQueryKey } from "@/utility/react-query-key";
+import { useQuery } from "@tanstack/react-query";
 // import type { IApiResponseType } from "../api-response-type";
 // import { localStorageKey } from "@/lib/auth-provider";
 
 // import { localStorageKey } from "@/lib/auth-provider";
 
-export interface IGmtType {
+export interface IUom {
     Id: number,
     Name: string
 };
 
-export async function GetAllUom(axios: AxiosInstance) {
+// export async function GetAllUom(axios: AxiosInstance) {
+//     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
+//     const response = await axios.get(`/production/uom`);
+//     return response.data;
+// }
+
+export function GetAllUom() {
     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-    const response = await axios.get(`/production/uom`);
-    return response.data;
+    const axios = useAxiosInstance();
+
+    const getData = async (): Promise<IUom[]> =>
+        (await axios.get(`/production/uom`)).data;
+    const query = useQuery({
+        queryKey: [ReactQueryKey.Uom],
+        queryFn: getData,
+        staleTime: 1000 * 10,
+    });
+
+    return query;
 }
 
 // export function GetAllActiveCountry() {

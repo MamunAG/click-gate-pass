@@ -18,7 +18,7 @@ export default function AppBackButton({ mutationIsPending, isPopup, navigationLi
                 navigator(navigationLink)
             }
             variant={"outline"}
-            className={cn("w-24", isPopup ? 'hidden' : '')}
+            className={cn("w-24", (isPopup ? 'hidden' : ''), 'cursor-pointer')}
         >
             Back
         </Button>

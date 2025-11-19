@@ -104,7 +104,7 @@ export default function useAxiosInstance() {
           console.error("Token refresh failed:", refreshError);
           await auth?.removeAccessToken();
           await auth?.removeRefreshToken();
-          window.location.href = "/sign-in";
+          // window.location.href = "/sign-in";
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;

@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import GatePassIndex from './pages/gate-pass/gate-pass-index'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import GatePassCRUD from './pages/gate-pass/new-gate-pass/Voucher-crud'
+import GatePassCRUD from './pages/gate-pass/crud/gate-pass-crud-index'
 import PageTitle from './components/PageTitle'
 
 const queryClient = new QueryClient()
