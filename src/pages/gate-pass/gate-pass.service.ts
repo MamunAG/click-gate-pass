@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AxiosInstance } from "axios";
 import { localStorageKey } from "@/lib/auth-provider";
 import type { IApiResponseType } from "@/actions/api-response-type";
@@ -59,10 +60,10 @@ export function GetAllMaterial() {
     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
     const axios = useAxiosInstance();
 
-    const getData = async (): Promise<IBuyer[]> =>
+    const getData = async (): Promise<any> =>
         (await axios.get(`/production/material-info/paged?currentPage=1&perPage=10`)).data;
     const query = useQuery({
-        queryKey: [ReactQueryKey.Buyer],
+        queryKey: [ReactQueryKey.Material],
         queryFn: getData,
         staleTime: 1000 * 10,
     });
@@ -84,7 +85,7 @@ export async function GetGatePassById(axios: AxiosInstance, id: number): Promise
 
 export async function Save(GatePassType: IGatePassSaveDto, axios: AxiosInstance) {
     const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-    const { supplierName: NAME } = GatePassType;
+    const { sender: NAME } = GatePassType;
 
     if (!NAME) {
         throw new Error("Supplier Name is required");
@@ -104,7 +105,7 @@ export async function Save(GatePassType: IGatePassSaveDto, axios: AxiosInstance)
 
 export async function Update(GatePassType: IGatePassSaveDto, axios: AxiosInstance) {
     const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-    const { supplierName: NAME } = GatePassType;
+    const { sender: NAME } = GatePassType;
 
     if (!NAME) {
         throw new Error("SupplierName is required");

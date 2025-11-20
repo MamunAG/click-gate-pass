@@ -10,7 +10,7 @@ import React from 'react';
 
 type props = {
     form: any,
-    text: string,
+    text?: string,
     textFieldName: string,
     valueFieldName: string,
     selectItems: SelectItemType[],
@@ -30,7 +30,8 @@ export default function AppFormCombobox(
     React.useEffect(() => {
         setPaymentMethods(selectItems);
     }, [selectItems])
-
+    console.log(textFieldName, form.getValues(textFieldName))
+    console.log(textFieldName, paymentMethods)
     return (
         <FormField
             control={form.control}

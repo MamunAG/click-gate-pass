@@ -10,7 +10,7 @@ export interface IItemType {
     name: string
 };
 
-export async function GetAllItemTypes(/*axios: AxiosInstance*/) {
+export function GetAllItemTypes(/*axios: AxiosInstance*/) {
     // const companyId = localStorage.getItem(localStorageKey.selectedCompany);
     // const response = await axios.get(`/${companyId}/country`);
     // return response.data;

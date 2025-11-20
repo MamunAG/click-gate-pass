@@ -37,35 +37,61 @@ import { localStorageKey } from "@/lib/auth-provider";
 import moment from "moment";
 import { useMutation } from "@tanstack/react-query";
 import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
-import { Delete, GetAllBuyer, Save, Update } from "../gate-pass.service";
+import { Delete, GetAllBuyer, GetAllMaterial, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
 import { GetAllItemTypes } from "@/actions/store/item-type-action";
 import { GetAllGmtTypes } from "@/actions/store/gmt-type-action";
 import { GetAllGatePassEmp } from "@/actions/store/gate-pass-emp-action";
 import { GetAllDepartment } from "@/actions/store/department-action";
 import { GetAllUom } from "@/actions/store/uom-action";
+import AppFormCombobox from "@/components/app-form-combobox";
 
 const GatepassDetailsSchema = z.object({
     Id: z.number(),
-    // GatepassId: z.coerce.number(),
-    // GatepasssNo: z.string().nullable().optional(),
-    // AccountId: z.coerce.number(),
-    // AccountName: z.string(),
-    // DebitAmount: z.coerce.number(),
-    // CreditAmount: z.coerce.number(),
-    // IsDebitAccount: z.boolean(),
+    buyer: z.string(),
+    buyerId: z.number(),
+
+    style: z.string(),
+    styleId: z.number(),
+
+    po: z.string(),
+    poId: z.number(),
+
+    program: z.string(),
+    programId: z.number(),
+
+    item: z.string(),
+    itemId: z.number(),
+
+    color: z.string(),
+    colorId: z.number(),
+
+    size: z.string(),
+    sizeId: z.number(),
+
+    quantity: z.number(),
+
+    uom: z.string(),
+    uomId: z.number(),
 });
 
 const formSchema = z.object({
     Id: z.number(),
     gatepassNo: z.string().min(1),
     date: z.date(),
+    itemType: z.string().optional(),
     itemTypeId: z.number(),
+    gmtType: z.string().optional(),
     gmtTypeId: z.number(),
+    gatePassType: z.string().optional(),
     gatePassTypeId: z.number(),
-    senderName: z.string(),
+    sender: z.string(),
+    senderId: z.number(),
+    senderPhoneNo: z.string().optional(),
     carriedBy: z.string(),
+    carriedById: z.number().optional(),
+    department: z.string().optional(),
     departmentId: z.number(),
-    supplierName: z.string().nullable().optional(),
+    supplier: z.string().nullable().optional(),
     supplierId: z.number().optional(),
     details: z.array(GatepassDetailsSchema),
 });
@@ -91,12 +117,20 @@ export default function GatePassForm({
 
     const itemTypesData = GetAllItemTypes();
     const { data: gmtTypesData } = GetAllGmtTypes();
-    const gatePassTypesData = [{ label: 'Returnable', value: 'Returnable' }, { label: 'Not Returnable', value: 'Not Returnable' }];
+    const gatePassTypesData = [{ label: 'Returnable', value: 1 }, { label: 'Not Returnable', value: 2 }];
     const { data: partysData } = GetAllActivesupplier();
     const { data: empolyessData } = GetAllGatePassEmp();
     const { data: departmentData } = GetAllDepartment();
     const { data: uomData } = GetAllUom();
     const { data: buyerData } = GetAllBuyer();
+    const { data: itemData } = GetAllMaterial();
+    const [stylesData, setStylesData] = React.useState<any[]>([]);
+    const [poData, setPoData] = React.useState<any[]>([]);
+    const [colorData, setColorData] = React.useState<any[]>([]);
+    const [sizeData, setSizeData] = React.useState<any[]>([]);
+    const [programData, setProgramData] = React.useState<any[]>([]);
+
+    console.log('itemData', itemData);
 
 
     const mutation = useMutation({
@@ -148,10 +182,10 @@ export default function GatePassForm({
             itemTypeId: data?.itemTypeId ?? 0,
             gmtTypeId: data?.gmtTypeId ?? 0,
             gatePassTypeId: data?.gatePassTypeId ?? 0,
-            senderName: data?.senderName ?? '',
+            sender: data?.sender ?? '',
             carriedBy: data?.carriedBy ?? '',
             departmentId: data?.departmentId ?? 0,
-            supplierName: data?.supplierName ?? '',
+            supplier: data?.supplier ?? '',
             supplierId: data?.supplierId ?? 0,
             details: []
         },
@@ -239,13 +273,23 @@ export default function GatePassForm({
     const handleOnAddRowClick = () => {
         append({
             Id: 0,
-            // GatepassId: 0,
-            // GatepasssNo: form.getValues("gatepassNo"),
-            // AccountId: 0,
-            // AccountName: '',
-            // DebitAmount: 0,
-            // CreditAmount: 0,
-            // IsDebitAccount: false,
+            buyerId: 0,
+            buyer: '',
+            styleId: 0,
+            style: '',
+            poId: 0,
+            po: '',
+            programId: 0,
+            program: '',
+            itemId: 0,
+            item: '',
+            colorId: 0,
+            color: '',
+            sizeId: 0,
+            size: '',
+            quantity: 0,
+            uomId: 0,
+            uom: ''
         })
     };
 
@@ -298,7 +342,7 @@ export default function GatePassForm({
                     <div className="min-w-full flex flex-col flex-wrap gap-2 justify-between mt-5">
                         {/* Gate-pass Master */}
                         <div className="w-full flex flex-wrap">
-                            <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-3 py-2">
+                            <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-1 py-2">
                                 {/* Gate-pass Id */}
                                 <FormField
                                     control={form.control}
@@ -320,102 +364,71 @@ export default function GatePassForm({
                                 {/* date */}
                                 <AppDate form={form} name={"date"} text={"Gatepass Date"} align="horizontal" labelCSS="w-32" />
 
-                                {/* Amount */}
-                                {/* <AppInput form={form} name={"Amount"} text={"Amount"} align="horizontal" labelCSS="w-32"
-                                    onBlur={() => {
-                                        const items = form.getValues("GatepassDetails");
-                                        items.forEach((_, index) => {
-                                            form.setValue(`GatepassDetails.${index}.DebitAmount`, form.getValues(`GatepassDetails.${index}.IsDebitAccount`) ? form.getValues("Amount") : 0);
-                                            form.setValue(`GatepassDetails.${index}.CreditAmount`, form.getValues(`GatepassDetails.${index}.IsDebitAccount`) ? 0 : form.getValues("Amount"));
-                                        });
-
-                                    }}
-                                /> */}
-                                {/* PaymentMethod */}
-                                {/* <AppFormCombobox
-                                    text="Payment Method"
-                                    textFieldName="PaymentMethodName"
-                                    valueFieldName="PaymentMethodId"
+                                {/* Item Type */}
+                                <AppAutoItemAddCombobox
                                     form={form}
-                                    selectItems={PaymentMethods}
-                                    onSelectCommandItem={() => {
-                                        if (form.getValues("PaymentMethodName") == 'Cheque') {
-                                            setChequeInputVisible(true);
-                                            //================================
-                                            setBBLCInputVisible(false);
-                                            form.setValue("bb_lc_no", '')
-
-                                            setTTInputVisible(false);
-                                            form.setValue("tt_no", '')
-                                        } else if (form.getValues("PaymentMethodName") == 'TT') {
-                                            setTTInputVisible(true);
-                                            //==================================
-                                            setChequeInputVisible(false);
-                                            form.setValue("ChequeNumber", '')
-                                            form.setValue("ChequeDate", undefined)
-
-                                            setBBLCInputVisible(false);
-                                            form.setValue("bb_lc_no", '')
-
-                                        } else if (form.getValues("PaymentMethodName") == 'LC') {
-                                            setBBLCInputVisible(true);
-                                            //================================
-                                            setChequeInputVisible(false);
-                                            form.setValue("ChequeNumber", '')
-                                            form.setValue("ChequeDate", undefined)
-
-                                            setTTInputVisible(false);
-                                            form.setValue("tt_no", '')
-                                        } else {
-                                            setChequeInputVisible(false);
-                                            form.setValue("ChequeNumber", '')
-                                            form.setValue("ChequeDate", undefined)
-
-                                            setBBLCInputVisible(false);
-                                            form.setValue("bb_lc_no", '')
-
-                                            setTTInputVisible(false);
-                                            form.setValue("tt_no", '')
-                                        }
-                                    }}
-                                    onClickXButton={() => {
-                                        setChequeInputVisible(false);
-                                        form.setValue("ChequeNumber", '')
-                                        form.setValue("ChequeDate", undefined)
-                                        form.setValue("bb_lc_no", '')
-                                    }}
-                                    align="horizontal" labelCSS="w-32"
-                                /> */}
-                                {/* <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", chequeInputVisible ? '' : 'hidden')}>
-                                    <AppInput form={form} name={"ChequeNumber"} text={"Cheque No"} className="flex-1" />
-                                    <div className="min-w-40">
-                                        <AppDate form={form} name={"ChequeDate"} text={"Cheque Date*"} />
-                                    </div>
-                                </div>
-                                <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", bblcInputVisible ? '' : 'hidden')}>
-                                    <AppInput form={form} name={"bb_lc_no"} text={"BB L/C No"} className="flex-1" />
-                                </div>
-                                <div className={cn("flex w-full gap-1 border border-red p-3 rounded-lg", ttInputVisible ? '' : 'hidden')}>
-                                    <AppInput form={form} name={"tt_no"} text={"TT No"} className="flex-1" />
-                                </div> */}
-                            </div>
-
-                            <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-3 py-2">
-                                {/* Payment Terms */}
-                                {/* <AppFormCombobox
-                                    text="Payment Terms"
-                                    textFieldName="PaymentTermsName"
-                                    valueFieldName="PaymentTermsId"
-                                    form={form}
-                                    selectItems={PaymentTerms}
+                                    text={"Item Type"}
+                                    textFieldName={"itemType"}
+                                    valueFieldName={"itemTypeId"}
+                                    selectItems={itemTypesData}
+                                    selectItemsLabelFieldName="name"
+                                    selectItemsValueFieldName="id"
                                     align="horizontal"
                                     labelCSS="w-32"
-                                /> */}
-                                {/* Party */}
+                                />
+                                {/* GMT Type */}
+                                <AppAutoItemAddCombobox
+                                    form={form}
+                                    text={"GMT Type"}
+                                    textFieldName={"gmtType"}
+                                    valueFieldName={"gmtTypeId"}
+                                    selectItems={
+                                        gmtTypesData?.map((_, i) => ({ ..._, id: i }))
+                                    }
+                                    selectItemsLabelFieldName="name"
+                                    selectItemsValueFieldName="id"
+                                    align="horizontal"
+                                    labelCSS="w-32"
+                                />
+                                {/* Gate-pass Type */}
+                                <AppAutoItemAddCombobox
+                                    form={form}
+                                    text={"Gate-pass Type"}
+                                    textFieldName={"gatePassType"}
+                                    valueFieldName={"gatePassTypeId"}
+                                    selectItems={gatePassTypesData}
+                                    selectItemsLabelFieldName="label"
+                                    selectItemsValueFieldName="value"
+                                    align="horizontal"
+                                    labelCSS="w-32"
+                                />
+                            </div>
+
+                            <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-1 py-2">
+                                {/* Sender */}
+                                <AppAutoItemAddCombobox
+                                    form={form}
+                                    text={"Sender"}
+                                    textFieldName={"sender"}
+                                    valueFieldName={"senderId"}
+                                    selectItems={
+                                        empolyessData?.map((_, i) => ({ ..._, id: i }))
+                                    }
+                                    selectItemsLabelFieldName="name"
+                                    selectItemsValueFieldName="id"
+                                    align="horizontal"
+                                    labelCSS="w-32"
+                                />
+
+                                {/* Sender Phone */}
+                                <AppInput form={form} name={"senderPhoneNo"} text={"Sender Phone"} disabled={false} align="horizontal" labelCSS="w-32" />
+
+
+                                {/* Supplier */}
                                 <AppAutoItemAddCombobox
                                     form={form}
                                     text={"Supplier"}
-                                    textFieldName={"supplierName"}
+                                    textFieldName={"supplier"}
                                     valueFieldName={"supplierId"}
                                     selectItems={partysData}
                                     selectItemsLabelFieldName="Name"
@@ -438,17 +451,41 @@ export default function GatePassForm({
                                 <AppInput form={form} name={"Description"} text={"Description"} align="horizontal" labelCSS="w-32" />
                             </div>
 
-                            <div className="w-full sm:w-5/12 lg:w-4/12 flex flex-col gap-3 py-2">
-                                {/* Master L/C */}
-                                {/* <AppFormCombobox
-                                    text="Master L/C"
-                                    textFieldName="master_lc_number"
-                                    valueFieldName="master_lc_id"
+                            <div className="w-full sm:w-5/12 lg:w-4/12 flex flex-col gap-1 py-2">
+                                {/* Carried By */}
+                                <AppAutoItemAddCombobox
                                     form={form}
-                                    selectItems={masterLCs}
+                                    text={"Carried By"}
+                                    textFieldName={"carriedBy"}
+                                    valueFieldName={"carriedById"}
+                                    selectItems={
+                                        empolyessData?.map((_, i) => ({ ..._, id: i }))
+                                    }
+                                    selectItemsLabelFieldName="name"
+                                    selectItemsValueFieldName="id"
                                     align="horizontal"
                                     labelCSS="w-32"
-                                /> */}
+                                />
+                                {/* Department */}
+                                <AppAutoItemAddCombobox
+                                    form={form}
+                                    text={"Department"}
+                                    textFieldName={"department"}
+                                    valueFieldName={"departmentId"}
+                                    selectItems={
+                                        departmentData?.map((_, i) => ({ ..._, id: i }))
+                                    }
+                                    selectItemsLabelFieldName="name"
+                                    selectItemsValueFieldName="id"
+                                    align="horizontal"
+                                    labelCSS="w-32"
+                                />
+                                {/* Gate-pass No */}
+                                {/* <AppInput form={form} name={"gatepassNo"} text={"Gatepass No"} disabled={true} align="horizontal" labelCSS="w-32" /> */}
+
+                                {/* Gate-pass No */}
+                                {/* <AppInput form={form} name={"gatepassNo"} text={"Gatepass No"} disabled={true} align="horizontal" labelCSS="w-32" /> */}
+
                                 <div className="flex w-full gap-1">
                                     <div className="flex-1">
                                         {/* Cuurrency */}
@@ -464,7 +501,7 @@ export default function GatePassForm({
                                         /> */}
                                     </div>
                                     <div>
-                                        <AppInput form={form} name={"currency_exchange_rate_bdt"} text="Ex.R" placeholder={"Exchange Rate"} align="horizontal" />
+                                        {/* <AppInput form={form} name={"currency_exchange_rate_bdt"} text="Ex.R" placeholder={"Exchange Rate"} align="horizontal" /> */}
                                     </div>
                                 </div>
                                 {/* Gatepass Type */}
@@ -482,26 +519,31 @@ export default function GatePassForm({
                         </div>
 
                         {/* Dynamic GatepassDetails */}
-                        <div className="space-y-4 border rounded p-4 w-full">
+                        <div className="space-y-4 border rounded-lg p-4 w-full min-h-64">
                             <div className="flex flex-wrap justify-between items-center">
                                 <h4 className="text-base font-semibold text-black">Gatepass Details</h4>
                                 <Button
                                     variant={"outline"}
                                     type="button"
-                                    className="border-blue-600 text-blue-600 hover:text-white hover:bg-blue-600"
+                                    className="border-blue-600 text-blue-600 hover:text-white hover:bg-blue-600 cursor-pointer"
                                     onClick={handleOnAddRowClick}
                                     size={"sm"}>
                                     <PlusCircle />
                                     Add Row
                                 </Button>
                             </div>
-                            <Table>
+                            <Table className="">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="whitespace-nowrap text-black text-center min-w-48">Account Name</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Debit Amount</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Credit Amount</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Is Debit Account</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center min-w-48">Buyer</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Style</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">PO</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Program</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Item</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Color</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Size</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Quantity</TableHead>
+                                        <TableHead className="whitespace-nowrap text-black text-center">Uom</TableHead>
                                         <TableHead className="whitespace-nowrap text-black text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -509,48 +551,93 @@ export default function GatePassForm({
                                     {fields.map((_item, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">
-                                                {/* <AppFormCombobox
+                                                <AppFormCombobox
                                                     form={form}
-                                                    textFieldName={`GatepassDetails.${index}.AccountName`}
-                                                    valueFieldName={`GatepassDetails.${index}.AccountId`}
-                                                    selectItems={ChartOfAccounts}
-                                                    text="" /> */}
+                                                    textFieldName={`details.${index}.buyer`}
+                                                    valueFieldName={`details.${index}.buyerId`}
+                                                    selectItems={buyerData?.map(_ => ({ label: _.NAME?.toString(), value: _.Id?.toString() })) ?? []}
+                                                    text=""
+                                                    onSelectCommandItem={async () => {
+                                                        const buyerId = form.getValues(`details.${index}.buyerId`)
+                                                        const styles = await GetAllStyleByBuyer(axios, Number(buyerId));
+                                                        const styleEntities = styles?.map(_ => ({ label: _.Styleno?.toString(), value: _.Id?.toString() }))
+                                                        setStylesData(styleEntities)
+                                                    }} />
                                             </TableCell>
-                                            <TableCell>
-                                                <AppInput form={form} name={`GatepassDetails.${index}.DebitAmount`} text={""} inputTextAlign="text-center" />
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.style`}
+                                                    valueFieldName={`details.${index}.styleId`}
+                                                    selectItems={stylesData ?? []}
+                                                    onSelectCommandItem={async () => {
+                                                        const styleId = form.getValues(`details.${index}.styleId`)
+                                                        const pos = await GetAllPoByStyle(axios, Number(styleId));
+                                                        const poEntities = pos?.map(_ => ({ label: _.Pono?.toString(), value: _.Id?.toString() }))
+                                                        setPoData(poEntities)
+                                                    }} />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.po`}
+                                                    valueFieldName={`details.${index}.poId`}
+                                                    selectItems={poData ?? []}
+                                                    onSelectCommandItem={async () => {
+                                                        // const styleId = form.getValues(`details.${index}.styleId`)
+                                                        // const pos = await GetAllPoByStyle(axios, Number(styleId));
+                                                        // const poEntities = pos?.map(_ => ({ label: _.Pono?.toString(), value: _.Id?.toString() }))
+                                                        // setPoData(poEntities)
+                                                    }} />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.program`}
+                                                    valueFieldName={`details.${index}.programId`}
+                                                    selectItems={buyerData?.map(_ => ({ label: _.NAME?.toString(), value: _.Id?.toString() })) ?? []}
+                                                    text="" />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.item`}
+                                                    valueFieldName={`details.${index}.itemId`}
+                                                    selectItems={itemData?.data?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
+                                                    text="" />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.color`}
+                                                    valueFieldName={`details.${index}.colorId`}
+                                                    selectItems={buyerData?.map(_ => ({ label: _.NAME?.toString(), value: _.Id?.toString() })) ?? []}
+                                                    text="" />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.size`}
+                                                    valueFieldName={`details.${index}.sizeId`}
+                                                    selectItems={buyerData?.map(_ => ({ label: _.NAME?.toString(), value: _.Id?.toString() })) ?? []}
+                                                    text="" />
                                             </TableCell>
                                             <TableCell>
                                                 <AppInput form={form} name={`GatepassDetails.${index}.CreditAmount`} text={""} inputTextAlign="text-center" />
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                {/* <FormField
-                                                    control={control}
-                                                    name={`GatepassDetails.${index}.IsDebitAccount`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <div className="flex gap-2 justify-center items-center">
-                                                                <FormControl>
-                                                                    <Checkbox
-                                                                        checked={field.value}
-                                                                        onCheckedChange={field.onChange}
-                                                                        name={field.name}
-                                                                        ref={field.ref}
-                                                                        className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                                                                    />
-                                                                </FormControl>
-                                                                <div className="space-y-1 leading-none">
-                                                                    <FormLabel className=" text-black dark:text-white">{field.value ? 'Yes' : 'No'}</FormLabel>
-                                                                </div>
-                                                            </div>
-                                                        </FormItem>
-                                                    )}
-                                                /> */}
+                                            <TableCell className="font-medium">
+                                                <AppFormCombobox
+                                                    form={form}
+                                                    textFieldName={`details.${index}.uom`}
+                                                    valueFieldName={`details.${index}.uomId`}
+                                                    selectItems={uomData?.map(_ => ({ label: _.Name?.toString(), value: _.Id?.toString() })) ?? []}
+                                                    text="" />
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <Button
                                                     variant={"ghost"}
                                                     type="button"
-                                                    className="text-red-600 hover:text-white hover:bg-red-600"
+                                                    className=" text-red-600 border border-red-600 hover:text-white hover:bg-red-600 p-1"
                                                     onClick={() => remove(index)}>
                                                     <Trash2 />
                                                 </Button>

@@ -44,7 +44,7 @@ export default function AppAutoItemAddCombobox({
             return { label: item[selectItemsLabelFieldName], value: item[selectItemsValueFieldName].toString() }
         })
         setParties(seItems ?? []);
-    }, [selectItems])
+    }, [selectItems, selectItemsLabelFieldName, selectItemsValueFieldName])
 
     return (
         <FormField

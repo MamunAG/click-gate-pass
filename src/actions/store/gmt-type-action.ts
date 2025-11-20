@@ -18,11 +18,14 @@ export function GetAllGmtTypes() {
 
     const getData = async (): Promise<IGmtType[]> =>
         (await axios.get(`/production/gatepass/get-gate-pass-garments-type`)).data;
+
     const query = useQuery({
         queryKey: [ReactQueryKey.GmtTypes],
         queryFn: getData,
         staleTime: 1000 * 10,
     });
+
+
 
     return query;
 }
