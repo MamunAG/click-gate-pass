@@ -6,56 +6,8 @@ import GatePassForm from './gate-pass-form';
 import { PageAction } from '@/utility/page-actions';
 import useAxiosInstance from '@/lib/axios-instance';
 import React from 'react';
-import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
-import { AppSheet } from '@/components/AppSheet';
-import TaxForm from '@/pages/Tax/Tax-form';
 import type { IGatePassSaveDto } from '../dto/gate-pass-save.dto';
 import { GetGatePassById } from '../gate-pass.service';
-// import AccountForm from '../Account/Account-form';
-// import SupplierForm from '@/pages/Configuration/Supplier/Supplier-form';
-// import MasterLCForm from '../MasterLC/MasterLC-form';
-
-// function PartyFormSheet() {
-//     return (
-//         <AppSheet
-//             title="New Supplier"
-//             btnText='Party'
-//             onOpenChange={(er) => console.log(er)}>
-//             {/* <SupplierForm data={undefined} pageAction={PageAction.add} isPopup={true} /> */}
-//         </AppSheet>
-//     )
-// }
-// function MasterLcFormSheet() {
-//     return (
-//         <AppSheet
-//             title="New Master L/C"
-//             btnText='Master L/C'
-//             onOpenChange={(er) => console.log(er)}>
-//             {/* <MasterLCForm data={undefined} pageAction={PageAction.add} isPopup={true} /> */}
-//         </AppSheet>
-//     )
-// }
-function TaxSetupFormSheet() {
-    return (
-        <AppSheet
-            title="New Tax"
-            btnText='Tax'
-            onOpenChange={(er) => console.log(er)}>
-            <TaxForm data={undefined} pageAction={PageAction.add} isPopup={true} />
-        </AppSheet>
-    )
-}
-
-// function ChartOfAccountFormSheet() {
-//     return (
-//         <AppSheet
-//             title="New Chart Of Account"
-//             btnText='Account'
-//             onOpenChange={(er) => console.log(er)}>
-//             {/* <AccountForm data={undefined} pageAction={PageAction.add} isPopup={true} /> */}
-//         </AppSheet>
-//     )
-// }
 
 export default function GatePassCRUD() {
     const axios = useAxiosInstance();
@@ -78,7 +30,6 @@ export default function GatePassCRUD() {
                             setVoucher(undefined);
                         } else {
                             setVoucher(res.Data);
-                            // console.log('voucher: ', res.Data);
                         }
                     })
                     .catch((m) => console.log(m));
@@ -123,9 +74,6 @@ export default function GatePassCRUD() {
     if (pageAction === PageAction.view) {
         return (
             <>
-                <BreadcrumbAddNew pageName="Voucher" isShowAddNewButton={false} handleNavigateToAddNewPage={() => { }} >
-                </BreadcrumbAddNew>
-
                 <div className="flex flex-col gap-10">
                     <GatePassForm data={voucher} pageAction={PageAction.view} />
                 </div>
@@ -135,14 +83,6 @@ export default function GatePassCRUD() {
     } else if (pageAction === PageAction.add) {
         return (
             <>
-                <BreadcrumbAddNew pageName="New Gate-pass" isShowAddNewButton={false} handleNavigateToAddNewPage={() => { }} >
-                    {/* <TransactionTypeFormSheet /> */}
-                    {/* <PartyFormSheet />
-                    <MasterLcFormSheet /> */}
-                    <TaxSetupFormSheet />
-                    {/* <ChartOfAccountFormSheet /> */}
-                </BreadcrumbAddNew>
-
                 <div className="flex flex-col gap-10">
                     <GatePassForm data={voucher} pageAction={PageAction.add} />
                 </div>
@@ -151,14 +91,6 @@ export default function GatePassCRUD() {
     } else if (pageAction === PageAction.edit) {
         return (
             <>
-                <BreadcrumbAddNew pageName="Update Gate-pass" isShowAddNewButton={false} handleNavigateToAddNewPage={() => { }} >
-                    {/* <TransactionTypeFormSheet /> */}
-                    {/* <PartyFormSheet />
-                    <MasterLcFormSheet /> */}
-                    <TaxSetupFormSheet />
-                    {/* <ChartOfAccountFormSheet /> */}
-                </BreadcrumbAddNew>
-
                 <div className="flex flex-col gap-10">
                     <GatePassForm data={voucher} pageAction={PageAction.edit} />
                 </div>
@@ -169,9 +101,6 @@ export default function GatePassCRUD() {
     } else if (pageAction === PageAction.delete) {
         return (
             <>
-                <BreadcrumbAddNew pageName="Delete Gate-pass" isShowAddNewButton={false} handleNavigateToAddNewPage={() => { }} >
-                </BreadcrumbAddNew>
-
                 <div className="flex flex-col gap-10">
                     <GatePassForm data={voucher} pageAction={PageAction.delete} />
                 </div>

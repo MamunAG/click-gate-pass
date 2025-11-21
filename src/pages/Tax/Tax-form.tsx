@@ -207,7 +207,7 @@ export default function TaxForm({
                                     name="Name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="block text-black dark:text-white">Tax Name</FormLabel>
+                                            <FormLabel className="block text-black dark:text-white">Name</FormLabel>
                                             <FormControl>
                                                 <Input type="text" {...field}
                                                     className="w-full border-[1.5px] border-gray-400 bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"

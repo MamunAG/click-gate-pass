@@ -23,7 +23,7 @@ export function AppSheet(params: AppSheetType) {
     return (
         <Sheet onOpenChange={params.onOpenChange}>
             <SheetTrigger asChild>
-                {params.sheetTrigger ?? <Button size={"sm"} variant="outline" type="button" className="border-green-500 text-green-600 hover:bg-green-200  cursor-pointer"><Plus />{params.btnText}</Button>}
+                {params.sheetTrigger ?? <Button size={"sm"} variant="outline" type="button" className="cursor-pointer"><Plus />{params.btnText}</Button>}
             </SheetTrigger>
             <SheetContent className={`z-999 bg-white overflow-y-auto`} style={{ maxWidth: `${params.width}` }}>
                 <SheetHeader>

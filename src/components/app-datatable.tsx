@@ -4,7 +4,7 @@ import { Button } from './ui/button'
 import React from 'react'
 import { Input } from './ui/input'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { DataTablePagination } from './DataTablePagination'
+// import { DataTablePagination } from './DataTablePagination'
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -130,7 +130,7 @@ export default function AppDataTable<TData, TValue>({
                 </Table>
             </div>
 
-            <DataTablePagination table={table} />
+            {/* <DataTablePagination table={table} /> */}
         </div>
 
     )

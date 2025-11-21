@@ -4,5 +4,5 @@ interface AppPageContainerProps {
 }
 
 export default function AppPageContainer({ children }: AppPageContainerProps) {
-    return <div className="bg-white w-full rounded-md p-3">{children}</div>;
+    return <div className="w-full rounded-md p-3">{children}</div>;
 }

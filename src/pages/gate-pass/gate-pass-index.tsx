@@ -34,21 +34,11 @@ export default function GatePassIndex() {
 
     const navigator = useNavigate();
     return (
-        <div>
+        <div className='p-3'>
             <BreadcrumbAddNew
-                pageName="Gate-pass"
                 addNewButtonText="Add New Gate-pass"
                 handleNavigateToAddNewPage={() => navigator(`${PageAction.add}/0`)} />
-
-            {/* <div className='flex justify-between items-center mt-5'>
-                <Label className='text-3xl'>Gate-Pass</Label>
-                <Button variant={"outline"} className='cursor-pointer'>
-                    <Link to={'/gate-pass/new'}>
-                        New Gate-pass
-                    </Link>
-                </Button>
-            </div> */}
-            <div className='mt-10'>
+            <div>
                 <GatePassIndexForm handleIndexFormSubmit={handleIndexFormSubmit} />
             </div>
             <div className='mt-5'>

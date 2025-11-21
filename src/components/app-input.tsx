@@ -44,9 +44,8 @@ export default function AppInput(
                                 disabled={disabled}
                                 className={cn("w-full border-[1.5px] border-gray-400 bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary",
                                     inputTextAlign && inputTextAlign,
-                                    "text-sm"
+                                    "text-sm h-8",
                                 )}
-                                size={10}
                                 onBlur={onBlur}
                             />
                         </FormControl>

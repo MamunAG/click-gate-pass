@@ -33,8 +33,6 @@ import AppDate from "@/components/app-date";
 import AppFormAction from "@/components/app-form-action";
 import { PlusCircle, Trash2 } from "lucide-react";
 import useApiUrl from "@/hooks/use-ApiUrl";
-import { localStorageKey } from "@/lib/auth-provider";
-import moment from "moment";
 import { useMutation } from "@tanstack/react-query";
 import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
 import { Delete, GetAllBuyer, GetAllMaterial, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
@@ -44,6 +42,8 @@ import { GetAllGatePassEmp } from "@/actions/store/gate-pass-emp-action";
 import { GetAllDepartment } from "@/actions/store/department-action";
 import { GetAllUom } from "@/actions/store/uom-action";
 import AppFormCombobox from "@/components/app-form-combobox";
+import { AppSheet } from "@/components/AppSheet";
+import TaxForm from "@/pages/Tax/Tax-form";
 
 const GatepassDetailsSchema = z.object({
     Id: z.number(),
@@ -114,6 +114,7 @@ export default function GatePassForm({
     const axios = useAxiosInstance();
     const api = useApiUrl();
     console.log(api)
+    console.log(setIsLoading)
 
     const itemTypesData = GetAllItemTypes();
     const { data: gmtTypesData } = GetAllGmtTypes();
@@ -126,12 +127,6 @@ export default function GatePassForm({
     const { data: itemData } = GetAllMaterial();
     const [stylesData, setStylesData] = React.useState<any[]>([]);
     const [poData, setPoData] = React.useState<any[]>([]);
-    const [colorData, setColorData] = React.useState<any[]>([]);
-    const [sizeData, setSizeData] = React.useState<any[]>([]);
-    const [programData, setProgramData] = React.useState<any[]>([]);
-
-    console.log('itemData', itemData);
-
 
     const mutation = useMutation({
         mutationFn: (tag: IGatePassSaveDto) => {
@@ -249,26 +244,6 @@ export default function GatePassForm({
         })
     };
 
-    async function getTaxDetails(id: number) {
-        // setIsLoading(true);
-        // const tax = await GetTaxById(axios, id);
-
-        // if (tax.IsError) {
-        //     toast("Message", {
-        //         position: "top-center",
-        //         description: (
-        //             <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4 overflow-auto">
-        //                 <code className="text-white text-sm">
-        //                     {tax.Errors.join("\n")}
-        //                 </code>
-        //             </pre>
-        //         ),
-        //     })
-        // } else {
-        //     // setTaxPercentage(tax?.Data?.Percentage);
-        // }
-        // setIsLoading(false);
-    }
 
     const handleOnAddRowClick = () => {
         append({
@@ -293,32 +268,17 @@ export default function GatePassForm({
         })
     };
 
-    const getCurrencyExchangeRate = async (id: number) => {
-        setIsLoading(true);
-        const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-
-        if (!companyId) {
-            return;
-        }
-
-        await axios.get(`${api.ProductionUrl}/${companyId}/CurrencyExchangeRates/GetCurrencyExchangeRates_bdt?baseCurrencyId=${id}&exchangeDate=${moment().format('YYYY-MM-DD')}`)
-            .then((res) => {
-                setIsLoading(false);
-                if (res.data) {
-                    // form.setValue("currency_exchange_rate_bdt", res.data?.rate_bdt);
-                }
-            })
-            .catch((err) => {
-                setIsLoading(false);
-                console.log(err);
-            })
-    }
-
     return (
         <AppPageContainer>
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
-                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={`/gate-pass`}>
+                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={`/dashboard/gate-pass`}>
+                        <AppSheet
+                            title="New UOM"
+                            btnText='UOM'
+                            onOpenChange={(er) => console.log(er)}>
+                            <TaxForm data={undefined} pageAction={PageAction.add} isPopup={true} />
+                        </AppSheet>
                         <Button
                             type="button"
                             disabled={mutation.isPending}
@@ -327,19 +287,14 @@ export default function GatePassForm({
                                 window.open(url, "_blank");
                             }}
                             variant={"outline"}
-                            className={cn(
-                                "w-auto bg-white text-green-600 border border-green-600",
-                                "hover:bg-green-200",
-                                "w-28", 'cursor-pointer'
-                            )}
+                            className={cn("w-28", 'cursor-pointer')}
                             size={"sm"}
                         >
                             Report
                         </Button>
-
                     </AppFormAction>
 
-                    <div className="min-w-full flex flex-col flex-wrap gap-2 justify-between mt-5">
+                    <div className="flex flex-col flex-wrap gap-2 justify-between mt-5">
                         {/* Gate-pass Master */}
                         <div className="w-full flex flex-wrap">
                             <div className="w-full sm:w-6/12 lg:w-4/12 flex flex-col gap-1 py-2">
@@ -451,8 +406,7 @@ export default function GatePassForm({
                                 <AppInput form={form} name={"Description"} text={"Description"} align="horizontal" labelCSS="w-32" />
                             </div>
 
-                            <div className="w-full sm:w-5/12 lg:w-4/12 flex flex-col gap-1 py-2">
-                                {/* Carried By */}
+                            <div className="w-full sm:w-5/12 lg:w-3/12 flex flex-col gap-1 py-2">
                                 <AppAutoItemAddCombobox
                                     form={form}
                                     text={"Carried By"}
@@ -466,7 +420,6 @@ export default function GatePassForm({
                                     align="horizontal"
                                     labelCSS="w-32"
                                 />
-                                {/* Department */}
                                 <AppAutoItemAddCombobox
                                     form={form}
                                     text={"Department"}
@@ -480,48 +433,13 @@ export default function GatePassForm({
                                     align="horizontal"
                                     labelCSS="w-32"
                                 />
-                                {/* Gate-pass No */}
-                                {/* <AppInput form={form} name={"gatepassNo"} text={"Gatepass No"} disabled={true} align="horizontal" labelCSS="w-32" /> */}
-
-                                {/* Gate-pass No */}
-                                {/* <AppInput form={form} name={"gatepassNo"} text={"Gatepass No"} disabled={true} align="horizontal" labelCSS="w-32" /> */}
-
-                                <div className="flex w-full gap-1">
-                                    <div className="flex-1">
-                                        {/* Cuurrency */}
-                                        {/* <AppFormCombobox
-                                            text="Currency"
-                                            textFieldName="currency_name"
-                                            valueFieldName="currency_id"
-                                            form={form}
-                                            selectItems={currencies}
-                                            align="horizontal"
-                                            labelCSS="w-32"
-                                            onSelectCommandItem={() => getCurrencyExchangeRate(Number(form.getValues("currency_id")))}
-                                        /> */}
-                                    </div>
-                                    <div>
-                                        {/* <AppInput form={form} name={"currency_exchange_rate_bdt"} text="Ex.R" placeholder={"Exchange Rate"} align="horizontal" /> */}
-                                    </div>
-                                </div>
-                                {/* Gatepass Type */}
-                                {/* <AppFormCombobox
-                                    text="Gatepass Type"
-                                    textFieldName="Gatepass_type_name"
-                                    valueFieldName="Gatepass_type_id"
-                                    form={form}
-                                    selectItems={GatepassTypes}
-                                    align="horizontal"
-                                    labelCSS="w-32"
-                                /> */}
                             </div>
-
                         </div>
 
-                        {/* Dynamic GatepassDetails */}
-                        <div className="space-y-4 border rounded-lg p-4 w-full min-h-64">
+                        {/* Gate-pass Details */}
+                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto max-w-7xl">
                             <div className="flex flex-wrap justify-between items-center">
-                                <h4 className="text-base font-semibold text-black">Gatepass Details</h4>
+                                <h4 className="text-base font-semibold ">Gatepass Details</h4>
                                 <Button
                                     variant={"outline"}
                                     type="button"
@@ -532,19 +450,19 @@ export default function GatePassForm({
                                     Add Row
                                 </Button>
                             </div>
-                            <Table className="">
-                                <TableHeader>
+                            <Table>
+                                <TableHeader className="">
                                     <TableRow>
-                                        <TableHead className="whitespace-nowrap text-black text-center min-w-48">Buyer</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Style</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">PO</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Program</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Item</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Color</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Size</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Quantity</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Uom</TableHead>
-                                        <TableHead className="whitespace-nowrap text-black text-center">Actions</TableHead>
+                                        <TableHead className="whitespace-nowrap text-center">Buyer</TableHead>
+                                        <TableHead className="whitespace-nowrap text-center">Style</TableHead>
+                                        <TableHead className="whitespace-nowrap text-center">PO</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Program</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Item</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Color</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Size</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center min-w-24">Quantity</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Uom</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -584,10 +502,7 @@ export default function GatePassForm({
                                                     valueFieldName={`details.${index}.poId`}
                                                     selectItems={poData ?? []}
                                                     onSelectCommandItem={async () => {
-                                                        // const styleId = form.getValues(`details.${index}.styleId`)
-                                                        // const pos = await GetAllPoByStyle(axios, Number(styleId));
-                                                        // const poEntities = pos?.map(_ => ({ label: _.Pono?.toString(), value: _.Id?.toString() }))
-                                                        // setPoData(poEntities)
+
                                                     }} />
                                             </TableCell>
                                             <TableCell className="font-medium">

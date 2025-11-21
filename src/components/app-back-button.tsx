@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
 
 type props = {
     mutationIsPending: boolean,
@@ -20,6 +21,7 @@ export default function AppBackButton({ mutationIsPending, isPopup, navigationLi
             variant={"outline"}
             className={cn("w-24", (isPopup ? 'hidden' : ''), 'cursor-pointer')}
         >
+            <ArrowLeft />
             Back
         </Button>
     )

@@ -1,19 +1,29 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "./components/app-sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { SiteHeader } from "@/components/site-header"
+import {
+    SidebarInset,
+    SidebarProvider,
+} from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
 
-export default function Layout(/*{ children }: { children: React.ReactNode }*/) {
-    // const cookieStore = await cookies()
-    // const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
+export default function Layout() {
     return (
-        <SidebarProvider /*defaultOpen={defaultOpen}*/ className="border border-blue-500">
-            <AppSidebar />
-            <main className="border border-red-400">
-                <SidebarTrigger />
-                {/* {children} */}
-                <Outlet />
-            </main>
+        <SidebarProvider
+            style={
+                {
+                    "--sidebar-width": "calc(var(--spacing) * 72)",
+                    "--header-height": "calc(var(--spacing) * 12)",
+                } as React.CSSProperties
+            }
+        >
+            <AppSidebar variant="inset" />
+            <SidebarInset>
+                <SiteHeader />
+                <div className="flex flex-1 flex-col">
+                    <Outlet />
+                </div>
+            </SidebarInset>
         </SidebarProvider>
     )
 }

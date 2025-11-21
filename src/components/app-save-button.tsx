@@ -16,7 +16,7 @@ export default function AppSaveButton({ pageAction, mutationIsPending: isPending
             disabled={isPending ? true : isLoading}
             className={cn(
                 "w-24",
-                pageAction === PageAction.view ? "hidden" : " ", 'cursor-pointer'
+                (pageAction === PageAction.view ? "hidden" : " "), 'cursor-pointer'
             )}
             variant={
                 pageAction === PageAction.delete ? "destructive" : "default"
