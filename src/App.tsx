@@ -8,6 +8,7 @@ import Home from './pages/home'
 import Layout from './layout'
 import { ThemeProvider } from './components/theme-provider'
 import LoginPage from './pages/login/page'
+import SignupPage from './pages/signup/page'
 // import Layout from './layout'
 
 const queryClient = new QueryClient()
@@ -19,6 +20,7 @@ function App() {
           <Routes>
             <Route path="/">
               <Route index element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
               <Route path="/dashboard" element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="gate-pass">

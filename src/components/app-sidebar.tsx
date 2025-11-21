@@ -29,25 +29,25 @@ import {
 // This is sample data.
 const data = {
     user: {
-        name: "shadcn",
-        email: "m@example.com",
+        name: "Najmuzzaman",
+        email: "najmuzzaman@clickerp.com.bd",
         avatar: "/avatars/shadcn.jpg",
     },
     teams: [
         {
-            name: "Acme Inc",
+            name: "Anowara Cotton",
             logo: GalleryVerticalEnd,
-            plan: "Enterprise",
+            plan: "Narayanganj",
         },
         {
-            name: "Acme Corp.",
+            name: "Anowara Fashion",
             logo: AudioWaveform,
-            plan: "Startup",
+            plan: "Narayanganj",
         },
         {
-            name: "Evil Corp.",
+            name: "Anowara Knit Composite.",
             logo: Command,
-            plan: "Free",
+            plan: "Gazipur",
         },
     ],
     navMain: [
