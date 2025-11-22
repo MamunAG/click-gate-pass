@@ -44,6 +44,7 @@ import { GetAllUom } from "@/actions/store/uom-action";
 import AppFormCombobox from "@/components/app-form-combobox";
 import { AppSheet } from "@/components/AppSheet";
 import TaxForm from "@/pages/Tax/Tax-form";
+import { SelectItemType } from "@/types/selectItemType";
 
 const GatepassDetailsSchema = z.object({
     Id: z.number(),
@@ -125,8 +126,8 @@ export default function GatePassForm({
     const { data: uomData } = GetAllUom();
     const { data: buyerData } = GetAllBuyer();
     const { data: itemData } = GetAllMaterial();
-    const [stylesData, setStylesData] = React.useState<any[]>([]);
-    const [poData, setPoData] = React.useState<any[]>([]);
+    const [stylesByBuyerData, setStylesByBuyerData] = React.useState<Record<string, SelectItemType[]>>({});
+    const [poByStyleData, setPoByStyleData] = React.useState<Record<string, SelectItemType[]>>({});
 
     const mutation = useMutation({
         mutationFn: (tag: IGatePassSaveDto) => {
@@ -479,7 +480,7 @@ export default function GatePassForm({
                                                         const buyerId = form.getValues(`details.${index}.buyerId`)
                                                         const styles = await GetAllStyleByBuyer(axios, Number(buyerId));
                                                         const styleEntities = styles?.map(_ => ({ label: _.Styleno?.toString(), value: _.Id?.toString() }))
-                                                        setStylesData(styleEntities)
+                                                        setStylesByBuyerData(pre => ({ ...pre, [buyerId.toString()]: styleEntities }))
                                                     }} />
                                             </TableCell>
                                             <TableCell className="font-medium">
@@ -487,12 +488,12 @@ export default function GatePassForm({
                                                     form={form}
                                                     textFieldName={`details.${index}.style`}
                                                     valueFieldName={`details.${index}.styleId`}
-                                                    selectItems={stylesData ?? []}
+                                                    selectItems={stylesByBuyerData[form.getValues(`details.${index}.buyerId`)] ?? []}
                                                     onSelectCommandItem={async () => {
                                                         const styleId = form.getValues(`details.${index}.styleId`)
                                                         const pos = await GetAllPoByStyle(axios, Number(styleId));
                                                         const poEntities = pos?.map(_ => ({ label: _.Pono?.toString(), value: _.Id?.toString() }))
-                                                        setPoData(poEntities)
+                                                        setPoByStyleData(pre => ({ ...pre, [styleId.toString()]: poEntities }))
                                                     }} />
                                             </TableCell>
                                             <TableCell className="font-medium">
@@ -500,10 +501,8 @@ export default function GatePassForm({
                                                     form={form}
                                                     textFieldName={`details.${index}.po`}
                                                     valueFieldName={`details.${index}.poId`}
-                                                    selectItems={poData ?? []}
-                                                    onSelectCommandItem={async () => {
-
-                                                    }} />
+                                                    selectItems={poByStyleData[form.getValues(`details.${index}.styleId`)] ?? []}
+                                                />
                                             </TableCell>
                                             <TableCell className="font-medium">
                                                 <AppFormCombobox
@@ -538,7 +537,7 @@ export default function GatePassForm({
                                                     text="" />
                                             </TableCell>
                                             <TableCell>
-                                                <AppInput form={form} name={`GatepassDetails.${index}.CreditAmount`} text={""} inputTextAlign="text-center" />
+                                                <AppInput form={form} name={`details.${index}.quantity`} text={""} inputTextAlign="text-center" />
                                             </TableCell>
                                             <TableCell className="font-medium">
                                                 <AppFormCombobox
