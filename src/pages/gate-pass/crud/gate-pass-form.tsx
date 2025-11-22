@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
@@ -168,7 +166,6 @@ export default function GatePassForm({
         },
     });
 
-    // 1. Define your form.
     const form = useForm<GatepassFormSchema>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -193,7 +190,6 @@ export default function GatePassForm({
         name: "details",
     });
 
-    // 2. Define a submit handler.
     function onSubmit(values: GatepassFormSchema) {
         console.log('submit', values);
         alert(JSON.stringify(values));
@@ -216,14 +212,12 @@ export default function GatePassForm({
                     return [`${fullKey}: ${(value as { message: string }).message}`];
                 }
 
-                // Array errors (like GatepassDetails[0])
                 if (Array.isArray(value)) {
                     return value.flatMap((item, index) =>
                         extractMessages(item, `${fullKey}[${index}]`)
                     );
                 }
 
-                // Nested object errors
                 if (typeof value === 'object') {
                     return extractMessages(value, fullKey);
                 }
@@ -440,7 +434,7 @@ export default function GatePassForm({
                         {/* Gate-pass Details */}
                         <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto max-w-7xl">
                             <div className="flex flex-wrap justify-between items-center">
-                                <h4 className="text-base font-semibold ">Gatepass Details</h4>
+                                <h4 className="text-base font-semibold">Gatepass Details</h4>
                                 <Button
                                     variant={"outline"}
                                     type="button"
