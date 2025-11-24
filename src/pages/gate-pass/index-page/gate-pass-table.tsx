@@ -82,7 +82,7 @@ export const columns: ColumnDef<IGatePassIndex>[] = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("createdBy")}</div>,
+        cell: ({ row }) => <div className="">{row.getValue("createdBy")}</div>,
     },
     {
         accessorKey: "refNo",

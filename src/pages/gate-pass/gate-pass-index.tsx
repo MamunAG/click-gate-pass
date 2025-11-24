@@ -6,22 +6,16 @@ import type { IGatePassIndex } from './index-page/gate-pass.dto';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
 import { PageAction } from '@/utility/page-actions';
-// import useAxiosInstance from '@/lib/axios-instance';
-// import { GetAllGmtTypes } from '@/actions/store/gmt-type-action';
-
 
 export default function GatePassIndex() {
     const [data, setData] = React.useState<IGatePassIndex[]>([]);
-    React.useEffect(() => setData(GatePassData), [])
-
-    // const axios = useAxiosInstance();
-
-    // const da = GetAllGmtTypes(axios);
+    const [filterData, setFilterData] = React.useState<IGatePassIndex[]>([]);
+    React.useEffect(() => { setData(GatePassData); setFilterData(GatePassData) }, [])
 
     function handleIndexFormSubmit({ createdBy, fromDate, toDate }: formIndexType) {
         let filterData = data;
         if (createdBy) {
-            filterData = filterData.filter(_ => _.createdBy == createdBy);
+            filterData = filterData.filter(_ => _.createdBy.includes(createdBy));
         }
         if (fromDate) {
             filterData = filterData.filter(_ => new Date(_.date) >= fromDate);
@@ -29,7 +23,7 @@ export default function GatePassIndex() {
         if (toDate) {
             filterData = filterData.filter(_ => new Date(_.date) <= toDate);
         }
-        setData(filterData);
+        setFilterData(filterData);
     }
 
     const navigator = useNavigate();
@@ -42,7 +36,7 @@ export default function GatePassIndex() {
                 <GatePassIndexForm handleIndexFormSubmit={handleIndexFormSubmit} />
             </div>
             <div className='mt-5'>
-                <GatePassTable data={data} />
+                <GatePassTable data={filterData} />
             </div>
         </div>
     )

@@ -67,7 +67,7 @@ const GatepassDetailsSchema = z.object({
     size: z.string(),
     sizeId: z.number(),
 
-    quantity: z.number(),
+    quantity: z.string(),
 
     uom: z.string(),
     uomId: z.number(),
@@ -257,7 +257,7 @@ export default function GatePassForm({
             color: '',
             sizeId: 0,
             size: '',
-            quantity: 0,
+            quantity: '',
             uomId: 0,
             uom: ''
         })
