@@ -42,7 +42,7 @@ export default function GatePassIndexForm({ handleIndexFormSubmit }: { handleInd
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div>
             <FormField
               control={form.control}

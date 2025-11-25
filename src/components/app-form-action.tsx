@@ -18,7 +18,7 @@ export default function AppFormAction({ pageAction, mutationIsPending, isLoading
     return (
         <div className="flex flex-wrap justify-between gap-2">
             <AppBackButton mutationIsPending={mutationIsPending} navigationLink={navigationLink} isPopup={isPopup} />
-            <div className="flex justify-between gap-2 w-full sm:w-auto">
+            <div className="flex flex-wrap justify-between gap-2 w-full sm:w-auto">
                 {children}
                 <AppCancelButton pageAction={pageAction} isPending={mutationIsPending} form={form} />
                 <AppSaveButton pageAction={pageAction} mutationIsPending={mutationIsPending} isLoading={isLoading} />

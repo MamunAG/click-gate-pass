@@ -432,7 +432,7 @@ export default function GatePassForm({
                         </div>
 
                         {/* Gate-pass Details */}
-                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto max-w-7xl">
+                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto md:max-w-11/12">
                             <div className="flex flex-wrap justify-between items-center">
                                 <h4 className="text-base font-semibold">Gatepass Details</h4>
                                 <Button
