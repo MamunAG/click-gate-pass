@@ -104,6 +104,15 @@ export default function GatePassForm({
     data: IGatePassSaveDto | undefined;
     pageAction: string;
 }) {
+
+    // const [width, setWidth] = React.useState(window.innerWidth);
+    // React.useEffect(() => {
+    //     const handleResize = () => setWidth(window.innerWidth);
+
+    //     window.addEventListener("resize", handleResize);
+    //     return () => window.removeEventListener("resize", handleResize);
+    // }, []);
+
     const { GatepassType } = useParams();
     console.log('GatepassType', GatepassType);
 
@@ -262,7 +271,6 @@ export default function GatePassForm({
             uom: ''
         })
     };
-
     return (
         <AppPageContainer>
             <Form {...form}>
@@ -432,7 +440,7 @@ export default function GatePassForm({
                         </div>
 
                         {/* Gate-pass Details */}
-                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto md:max-w-11/12">
+                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full max-w-7xl overflow-auto">
                             <div className="flex flex-wrap justify-between items-center">
                                 <h4 className="text-base font-semibold">Gatepass Details</h4>
                                 <Button
@@ -455,7 +463,7 @@ export default function GatePassForm({
                                         <TableHead className="whitespace-nowrap  text-center">Item</TableHead>
                                         <TableHead className="whitespace-nowrap  text-center">Color</TableHead>
                                         <TableHead className="whitespace-nowrap  text-center">Size</TableHead>
-                                        <TableHead className="whitespace-nowrap  text-center min-w-24">Quantity</TableHead>
+                                        <TableHead className="whitespace-nowrap  text-center w-24 min-w-24">Quantity</TableHead>
                                         <TableHead className="whitespace-nowrap  text-center">Uom</TableHead>
                                         <TableHead className="whitespace-nowrap  text-center">Actions</TableHead>
                                     </TableRow>
