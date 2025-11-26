@@ -55,7 +55,7 @@ const data = {
             title: "Store",
             url: "#",
             icon: SquareTerminal,
-            isActive: true,
+            // isActive: true,
             items: [
                 {
                     title: "Gate-pass",

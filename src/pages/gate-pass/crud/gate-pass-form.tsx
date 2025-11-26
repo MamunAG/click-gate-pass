@@ -440,7 +440,7 @@ export default function GatePassForm({
                         </div>
 
                         {/* Gate-pass Details */}
-                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full max-w-7xl overflow-auto">
+                        <div className="space-y-4 border rounded-lg p-4 min-h-64 w-full overflow-auto">
                             <div className="flex flex-wrap justify-between items-center">
                                 <h4 className="text-base font-semibold">Gatepass Details</h4>
                                 <Button
@@ -553,7 +553,7 @@ export default function GatePassForm({
                                                 <Button
                                                     variant={"ghost"}
                                                     type="button"
-                                                    className=" text-red-600 border border-red-600 hover:text-white hover:bg-red-600 p-1"
+                                                    className=" text-red-600 border border-red-600 hover:text-white hover:bg-red-600 p-1 cursor-pointer"
                                                     onClick={() => remove(index)}>
                                                     <Trash2 />
                                                 </Button>
