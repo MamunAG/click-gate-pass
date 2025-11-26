@@ -25,6 +25,7 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar"
+import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 
 // This is sample data.
 const data = {
@@ -163,8 +164,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <TeamSwitcher teams={data.teams} />
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
+                <ScrollArea className="h-full">
+                    <NavMain items={data.navMain} />
+                    <NavProjects projects={data.projects} />
+                    <ScrollBar orientation="vertical" />
+                </ScrollArea>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />
