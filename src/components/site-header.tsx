@@ -1,11 +1,17 @@
-// import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Home } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { ModeToggle } from "./mode-toggle"
+import { useAppStore } from "@/store/app-store"
+import React from "react"
 
 export function SiteHeader() {
+    const pageName = useAppStore((state) => state.pageName);
+    const setPageTitle = useAppStore((state) => state.setPageName);
+    const location = useLocation();
+    React.useEffect(() => { if (location.pathname === '/dashboard') setPageTitle('') }, [location.pathname, setPageTitle])
+
     return (
         <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
             <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
@@ -14,19 +20,14 @@ export function SiteHeader() {
                     orientation="vertical"
                     className="mx-2 data-[orientation=vertical]:h-4"
                 />
-                <Link to="/dashboard" className="flex items-center gap-1">
-                    <h1 className="text-base font-medium text-blue-700 dark:text-white">Click ERP</h1>
-                </Link>
-                <Separator
-                    orientation="vertical"
-                    className="mx-2 data-[orientation=vertical]:h-4"
-                />
+
                 <Link to="/dashboard" className="flex items-center gap-1"><Home size={16} /></Link>
                 <Separator
                     orientation="vertical"
                     className="mx-2 data-[orientation=vertical]:h-4"
                 />
-                <h1 className="text-base font-medium">Documents</h1>
+                {/* <h1 className="text-base font-medium">Documents</h1> */}
+                <h1 className="text-base font-medium">{pageName}</h1>
                 <div className="ml-auto flex items-center gap-2">
                     {/* <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
                         <a
@@ -38,6 +39,13 @@ export function SiteHeader() {
                             GitHub
                         </a>
                     </Button> */}
+                    <Link to="/dashboard" className="flex items-center gap-1">
+                        <h1 className="text-base font-medium text-blue-700 dark:text-white">Click ERP</h1>
+                    </Link>
+                    <Separator
+                        orientation="vertical"
+                        className="mx-2 data-[orientation=vertical]:h-4"
+                    />
                     <ModeToggle />
                 </div>
             </div>

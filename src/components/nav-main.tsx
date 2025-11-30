@@ -18,6 +18,7 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Link } from "react-router-dom"
+import { useAppStore } from "@/store/app-store"
 
 export function NavMain({
     items,
@@ -33,6 +34,8 @@ export function NavMain({
         }[]
     }[]
 }) {
+    const setPageTitle = useAppStore((state) => state.setPageName);
+    // console.log(pageTitle);
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -72,7 +75,7 @@ export function NavMain({
                                                 <SidebarMenuSub>
                                                     {item.items?.map((subItem) => (
                                                         <SidebarMenuSubItem key={subItem.title}>
-                                                            <SidebarMenuSubButton asChild>
+                                                            <SidebarMenuSubButton asChild onClick={() => setPageTitle(subItem.title)}>
                                                                 <Link to={subItem.url}>
                                                                     <span>{subItem.title}</span>
                                                                 </Link>
@@ -85,7 +88,7 @@ export function NavMain({
                                     </Collapsible>
                                     {item.items?.map((subItem) => (
                                         <SidebarMenuSubItem key={subItem.title}>
-                                            <SidebarMenuSubButton asChild>
+                                            <SidebarMenuSubButton asChild onClick={() => setPageTitle(subItem.title)}>
                                                 <Link to={subItem.url}>
                                                     <span>{subItem.title}</span>
                                                 </Link>

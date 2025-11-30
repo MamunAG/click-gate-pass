@@ -36,8 +36,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import type { IGatePassIndex } from "./gate-pass.dto"
-// import { GatePassData } from "./gate-pass.data"
-
 
 export const columns: ColumnDef<IGatePassIndex>[] = [
     {
@@ -187,10 +185,10 @@ export function GatePassTable({ data }: { data: IGatePassIndex[] }) {
         <div className="w-full">
             <div className="flex items-center py-4 hidden">
                 <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+                    placeholder="Filter ref. number..."
+                    value={(table.getColumn("refNo")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("refNo")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
