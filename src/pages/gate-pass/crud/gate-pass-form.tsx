@@ -553,7 +553,7 @@ export default function GatePassForm({
                                                 <Button
                                                     variant={"ghost"}
                                                     type="button"
-                                                    className=" text-red-600 border border-red-600 hover:text-white hover:bg-red-600 p-1 cursor-pointer"
+                                                    className=" text-red-600 hover:text-white hover:bg-red-600 p-1 cursor-pointer"
                                                     onClick={() => remove(index)}>
                                                     <Trash2 />
                                                 </Button>

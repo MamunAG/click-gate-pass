@@ -136,12 +136,12 @@ export const columns: ColumnDef<IGatePassIndex>[] = [
                         <DropdownMenuItem
                             onClick={() => navigator.clipboard.writeText(payment.id)}
                         >
-                            Copy Gate-pass Number
+                            Copy Ref. Number
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem>Show</DropdownMenuItem>
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600 focus:bg-destructive focus:text-white">Delete</DropdownMenuItem>
-                        <DropdownMenuItem>Show</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
