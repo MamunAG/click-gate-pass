@@ -25,7 +25,7 @@ export function AppSheet(params: AppSheetType) {
             <SheetTrigger asChild>
                 {params.sheetTrigger ?? <Button size={"sm"} variant="outline" type="button" className="cursor-pointer"><Plus />{params.btnText}</Button>}
             </SheetTrigger>
-            <SheetContent className={`z-999 bg-white overflow-y-auto`} style={{ maxWidth: `${params.width}` }}>
+            <SheetContent className={`z-999 overflow-y-auto`} style={{ maxWidth: `${params.width}` }}>
                 <SheetHeader>
                     <SheetTitle>{params.title ?? 'Edit profile'}</SheetTitle>
                     <SheetDescription>

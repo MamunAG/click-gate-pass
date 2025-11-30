@@ -14,6 +14,13 @@ export function SiteHeader() {
                     orientation="vertical"
                     className="mx-2 data-[orientation=vertical]:h-4"
                 />
+                <Link to="/dashboard" className="flex items-center gap-1">
+                    <h1 className="text-base font-medium text-blue-700 dark:text-white">Click ERP</h1>
+                </Link>
+                <Separator
+                    orientation="vertical"
+                    className="mx-2 data-[orientation=vertical]:h-4"
+                />
                 <Link to="/dashboard" className="flex items-center gap-1"><Home size={16} /></Link>
                 <Separator
                     orientation="vertical"
