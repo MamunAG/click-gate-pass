@@ -6,11 +6,14 @@ import type { IGatePassIndex } from './index-page/gate-pass.dto';
 import { useNavigate } from 'react-router-dom';
 import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
 import { PageAction } from '@/utility/page-actions';
+import { useAppStore } from '@/store/app-store';
 
 export default function GatePassIndex() {
     const [data, setData] = React.useState<IGatePassIndex[]>([]);
     const [filterData, setFilterData] = React.useState<IGatePassIndex[]>([]);
     React.useEffect(() => { setData(GatePassData); setFilterData(GatePassData) }, [])
+    const setPageTitle = useAppStore((state) => state.setPageName);
+    React.useEffect(() => { setPageTitle('Gate-pass') }, [setPageTitle])
 
     function handleIndexFormSubmit({ createdBy, fromDate, toDate }: formIndexType) {
         let filterData = data;

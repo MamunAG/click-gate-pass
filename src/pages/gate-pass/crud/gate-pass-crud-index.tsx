@@ -8,8 +8,11 @@ import useAxiosInstance from '@/lib/axios-instance';
 import React from 'react';
 import type { IGatePassSaveDto } from '../dto/gate-pass-save.dto';
 import { GetGatePassById } from '../gate-pass.service';
+import { useAppStore } from '@/store/app-store';
 
 export default function GatePassCRUD() {
+    const setPageTitle = useAppStore((state) => state.setPageName);
+    React.useEffect(() => { setPageTitle('Gate-pass') }, [setPageTitle])
     const axios = useAxiosInstance();
     const [voucher, setVoucher] = React.useState<IGatePassSaveDto | undefined>();
     const [isLoading, setIsLoading] = React.useState(false);
