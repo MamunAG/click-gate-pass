@@ -5,8 +5,8 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import type { SelectItemType } from '@/types/selectItemType';
-import { Check, ChevronsUpDown, X } from 'lucide-react';
-import React from 'react';
+import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
+import React, { startTransition } from 'react';
 
 type props = {
     form: any,
@@ -14,22 +14,29 @@ type props = {
     textFieldName: string,
     valueFieldName: string,
     selectItems?: SelectItemType[],
+    selectItemsValueFieldName?: string,
+    selectItemsLabelFieldName?: string
     onSelectCommandItem?: () => void,
     onClickXButton?: () => void,
     isShowText?: boolean,
     align?: 'vertical' | 'horizontal',
     labelCSS?: string,
-    onScrollFun?: (currentPage?: number, perPage?: number) => Promise<any>
+    onScrollFun?: (search: string, currentPage: number) => Promise<any>
 }
 
 export default function AppFormCombobox(
-    { text, isShowText = true, textFieldName, valueFieldName, form, selectItems, onSelectCommandItem, onClickXButton,
-        align = 'vertical', labelCSS = "w-16", onScrollFun }: props) {
+    { text, isShowText = true, textFieldName, valueFieldName,
+        form, selectItems, onSelectCommandItem, onClickXButton,
+        align = 'vertical', labelCSS = "w-16", onScrollFun,
+        selectItemsValueFieldName = 'value',
+        selectItemsLabelFieldName = 'label', }: props) {
     const [openPaymentMethod, setOpenPaymentMethod] = React.useState(false)
     const [paymentMethods, setPaymentMethods] = React.useState<SelectItemType[]>([])
     const [page, setPage] = React.useState(1);
     const [isLoadingRef, setIsLoadingRef] = React.useState(false);
     const scrollTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [search, setSearch] = React.useState("");
+    const [isSearching, setIsSearching] = React.useState(false);
 
     React.useEffect(() => {
         if (selectItems) {
@@ -37,11 +44,13 @@ export default function AppFormCombobox(
         }
     }, [selectItems])
 
+
+
     function getData() {
         if (onScrollFun && !isLoadingRef) {
             setIsLoadingRef(true);
-            onScrollFun(page, 10).then(res => {
-                const da = res?.map((_: any) => ({ label: _["name"]?.toString(), value: _["id"]?.toString() })) ?? []
+            onScrollFun(search, page).then(res => {
+                const da = res?.map((_: any) => ({ label: _[selectItemsLabelFieldName]?.toString(), value: _[selectItemsValueFieldName]?.toString() })) ?? []
                 if (page == 1) {
                     setPaymentMethods(da);
                 } else {
@@ -65,6 +74,34 @@ export default function AppFormCombobox(
         getData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
+
+    React.useEffect(() => {
+        if (!search) {
+            startTransition(() => {
+                // setResults([]);
+                setIsSearching(false);
+            });
+            return;
+        }
+
+        startTransition(() => {
+            setIsSearching(true);
+        });
+        const timer = setTimeout(() => {
+            // Simulate API call
+            startTransition(() => {
+                // setResults([
+                //     `${search} - Result 1`,
+                //     `${search} - Result 2`,
+                //     `${search} - Result 3`,
+                // ]);
+                getData();
+                setIsSearching(false);
+            });
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [search]);
 
 
     const handleScroll = (e: any) => {
@@ -140,38 +177,51 @@ export default function AppFormCombobox(
                             <PopoverContent className="w-auto p-0 bg-white text-black border-gray-400 z-999" align="start">
                                 <Command>
                                     <CommandInput
+                                        onValueChange={setSearch}
+                                        value={search}
                                         placeholder={`Search ${text?.toLowerCase()}...`}
                                         className="h-9"
                                     />
                                     <CommandList onScroll={(e) => {
                                         handleScroll(e)
                                     }}>
-                                        <CommandEmpty>No ${text?.toLowerCase()} found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {paymentMethods?.map((language) => (
-                                                <CommandItem
-                                                    value={language.label}
-                                                    key={language.value}
-                                                    onSelect={() => {
-                                                        form.setValue(valueFieldName, Number(language.value))
-                                                        form.setValue(textFieldName, language.label)
-                                                        setOpenPaymentMethod(false)
+                                        {isSearching ? (
+                                            <div className="flex items-center justify-center p-4">
+                                                <Loader2 className="size-4 animate-spin" />
+                                                <span className="text-muted-foreground ml-2 text-sm">
+                                                    Searching...
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <CommandEmpty>No {text?.toLowerCase()} found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {paymentMethods?.map((language) => (
+                                                        <CommandItem
+                                                            value={language.label}
+                                                            key={language.value}
+                                                            onSelect={() => {
+                                                                form.setValue(valueFieldName, Number(language.value))
+                                                                form.setValue(textFieldName, language.label)
+                                                                setOpenPaymentMethod(false)
 
-                                                        onSelectCommandItem?.();
-                                                    }}
-                                                >
-                                                    {language.label}
-                                                    <Check
-                                                        className={cn(
-                                                            "ml-auto",
-                                                            language.value === field.value?.toString()
-                                                                ? "opacity-100"
-                                                                : "opacity-0"
-                                                        )}
-                                                    />
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
+                                                                onSelectCommandItem?.();
+                                                            }}
+                                                        >
+                                                            {language.label}
+                                                            <Check
+                                                                className={cn(
+                                                                    "ml-auto",
+                                                                    language.value === field.value?.toString()
+                                                                        ? "opacity-100"
+                                                                        : "opacity-0"
+                                                                )}
+                                                            />
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </>
+                                        )}
                                     </CommandList>
                                 </Command>
                             </PopoverContent>

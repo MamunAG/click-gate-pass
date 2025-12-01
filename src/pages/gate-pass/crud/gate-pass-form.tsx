@@ -145,9 +145,9 @@ export default function GatePassForm({
     const [poByStyleData, setPoByStyleData] = React.useState<Record<string, SelectItemType[]>>({});
 
 
-    function GetAllMaterialWithPagination(currentPage: number = 1, perPage: number = 10) {
+    function GetAllMaterialWithPagination(search: string, currentPage: number = 1) {
         const getData = async (): Promise<any> =>
-            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}`)).data;
+            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${10}`)).data;
 
         return getData().then((res: any) => {
             console.log('item', res);
@@ -546,7 +546,9 @@ export default function GatePassForm({
                                                     textFieldName={`details.${index}.item`}
                                                     valueFieldName={`details.${index}.itemId`}
                                                     // selectItems={itemData?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
-                                                    onScrollFun={async (currentPage?: number, perPage?: number) => await GetAllMaterialWithPagination(currentPage, perPage)}
+                                                    selectItemsValueFieldName='id'
+                                                    selectItemsLabelFieldName='name'
+                                                    onScrollFun={async (search: string, currentPage: number) => await GetAllMaterialWithPagination(search, currentPage)}
                                                     text="" />
                                             </TableCell>
 
