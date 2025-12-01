@@ -147,7 +147,7 @@ export default function GatePassForm({
 
     function GetAllMaterialWithPagination(search: string, currentPage: number = 1) {
         const getData = async (): Promise<any> =>
-            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${10}`)).data;
+            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${10}&search=${search}`)).data;
 
         return getData().then((res: any) => {
             console.log('item', res);
