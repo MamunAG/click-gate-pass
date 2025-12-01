@@ -33,7 +33,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import useApiUrl from "@/hooks/use-ApiUrl";
 import { useMutation } from "@tanstack/react-query";
 import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
-import { Delete, GetAllBuyer, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
+import { Delete, GetAllBuyer, GetAllMaterialWithPagination, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
 import { GetAllItemTypes } from "@/actions/store/item-type-action";
 import { GetAllGmtTypes } from "@/actions/store/gmt-type-action";
 import { GetAllGatePassEmp } from "@/actions/store/gate-pass-emp-action";
@@ -145,16 +145,6 @@ export default function GatePassForm({
     const [poByStyleData, setPoByStyleData] = React.useState<Record<string, SelectItemType[]>>({});
 
 
-    function GetAllMaterialWithPagination(search: string, currentPage: number = 1) {
-        const getData = async (): Promise<any> =>
-            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${10}&search=${search}`)).data;
-
-        return getData().then((res: any) => {
-            console.log('item', res);
-            // setItemData((prev: any) => [...prev, ...res.data]);
-            return res.data;
-        });
-    }
 
     // useEffect(() => GetAllMaterialWithPagination(), [])
 
@@ -548,7 +538,8 @@ export default function GatePassForm({
                                                     // selectItems={itemData?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
                                                     selectItemsValueFieldName='id'
                                                     selectItemsLabelFieldName='name'
-                                                    onScrollFun={async (search: string, currentPage: number) => await GetAllMaterialWithPagination(search, currentPage)}
+                                                    onScrollFun={async (search: string, currentPage: number) =>
+                                                        await GetAllMaterialWithPagination({ axios, search, currentPage, perPage: 10 })}
                                                     text="" />
                                             </TableCell>
 

@@ -71,18 +71,14 @@ export function GetAllMaterial() {
     return query;
 }
 
-export function GetAllMaterialWithPagination(currentPage: number, perPage: number) {
-    const axios = useAxiosInstance();
-
+export function GetAllMaterialWithPagination({ axios, search, currentPage, perPage }: { axios: AxiosInstance, search: string, currentPage: number, perPage: number }) {
     const getData = async (): Promise<any> =>
-        (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}`)).data;
-    const query = useQuery({
-        queryKey: [ReactQueryKey.Material],
-        queryFn: getData,
-        staleTime: 1000 * 10,
-    });
+        (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}&search=${search}`)).data;
 
-    return query;
+    return getData().then((res: any) => {
+        console.log('item', res);
+        return res.data;
+    });
 }
 
 export async function GetAllGatePass(axios: AxiosInstance, gatepassTypeId: number): Promise<IApiResponseType<IGatePassSaveDto[]>> {
