@@ -44,8 +44,6 @@ export default function AppFormCombobox(
         }
     }, [selectItems])
 
-
-
     function getData() {
         if (onScrollFun && !isLoadingRef) {
             setIsLoadingRef(true);
@@ -76,9 +74,11 @@ export default function AppFormCombobox(
     }, [page]);
 
     React.useEffect(() => {
+        if (!onScrollFun) {
+            return;
+        }
         if (!search) {
             startTransition(() => {
-                // setResults([]);
                 setIsSearching(false);
             });
             return;
@@ -90,11 +90,6 @@ export default function AppFormCombobox(
         const timer = setTimeout(() => {
             // Simulate API call
             startTransition(() => {
-                // setResults([
-                //     `${search} - Result 1`,
-                //     `${search} - Result 2`,
-                //     `${search} - Result 3`,
-                // ]);
                 getData();
                 setIsSearching(false);
             });

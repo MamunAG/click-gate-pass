@@ -526,25 +526,21 @@ export default function GatePassForm({
                                                     selectItems={buyerData?.map(_ => ({ label: _.NAME?.toString(), value: _.Id?.toString() })) ?? []}
                                                     text="" />
                                             </TableCell>
+
+
+
+
                                             <TableCell className="font-medium">
-
-
-
-
                                                 <AppFormCombobox
                                                     form={form}
                                                     textFieldName={`details.${index}.item`}
                                                     valueFieldName={`details.${index}.itemId`}
-                                                    // selectItems={itemData?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
                                                     selectItemsValueFieldName='id'
                                                     selectItemsLabelFieldName='name'
                                                     onScrollFun={async (search: string, currentPage: number) =>
                                                         await GetAllMaterialWithPagination({ axios, search, currentPage, perPage: 10 })}
                                                     text="" />
                                             </TableCell>
-
-
-
 
 
 
