@@ -33,7 +33,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import useApiUrl from "@/hooks/use-ApiUrl";
 import { useMutation } from "@tanstack/react-query";
 import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
-import { Delete, GetAllBuyer, GetAllMaterial, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
+import { Delete, GetAllBuyer, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
 import { GetAllItemTypes } from "@/actions/store/item-type-action";
 import { GetAllGmtTypes } from "@/actions/store/gmt-type-action";
 import { GetAllGatePassEmp } from "@/actions/store/gate-pass-emp-action";
@@ -67,7 +67,11 @@ const GatepassDetailsSchema = z.object({
     size: z.string(),
     sizeId: z.number(),
 
-    quantity: z.string(),
+    quantity: z.preprocess((val) => {
+        if (typeof val === 'string' && val.trim() === '') return val;
+        const n = Number(val as any);
+        return Number.isNaN(n) ? val : n;
+    }, z.number()),
 
     uom: z.string(),
     uomId: z.number(),
@@ -124,6 +128,7 @@ export default function GatePassForm({
     console.log(api)
     console.log(setIsLoading)
 
+
     const itemTypesData = GetAllItemTypes();
     const { data: gmtTypesData } = GetAllGmtTypes();
     const gatePassTypesData = [{ label: 'Returnable', value: 1 }, { label: 'Not Returnable', value: 2 }];
@@ -132,9 +137,26 @@ export default function GatePassForm({
     const { data: departmentData } = GetAllDepartment();
     const { data: uomData } = GetAllUom();
     const { data: buyerData } = GetAllBuyer();
-    const { data: itemData } = GetAllMaterial();
+
+    // const { data: itemData } = GetAllMaterial();
+
+
     const [stylesByBuyerData, setStylesByBuyerData] = React.useState<Record<string, SelectItemType[]>>({});
     const [poByStyleData, setPoByStyleData] = React.useState<Record<string, SelectItemType[]>>({});
+
+
+    function GetAllMaterialWithPagination(currentPage: number = 1, perPage: number = 10) {
+        const getData = async (): Promise<any> =>
+            (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}`)).data;
+
+        return getData().then((res: any) => {
+            console.log('item', res);
+            // setItemData((prev: any) => [...prev, ...res.data]);
+            return res.data;
+        });
+    }
+
+    // useEffect(() => GetAllMaterialWithPagination(), [])
 
     const mutation = useMutation({
         mutationFn: (tag: IGatePassSaveDto) => {
@@ -176,7 +198,7 @@ export default function GatePassForm({
     });
 
     const form = useForm<GatepassFormSchema>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as any,
         defaultValues: {
             Id: data?.id ?? 0,
             gatepassNo: 'Gate-pass-001',
@@ -266,7 +288,7 @@ export default function GatePassForm({
             color: '',
             sizeId: 0,
             size: '',
-            quantity: '',
+            quantity: 0,
             uomId: 0,
             uom: ''
         })
@@ -515,13 +537,24 @@ export default function GatePassForm({
                                                     text="" />
                                             </TableCell>
                                             <TableCell className="font-medium">
+
+
+
+
                                                 <AppFormCombobox
                                                     form={form}
                                                     textFieldName={`details.${index}.item`}
                                                     valueFieldName={`details.${index}.itemId`}
-                                                    selectItems={itemData?.data?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
+                                                    // selectItems={itemData?.map((_: any) => ({ label: _.name?.toString(), value: _.id?.toString() })) ?? []}
+                                                    onScrollFun={async (currentPage?: number, perPage?: number) => await GetAllMaterialWithPagination(currentPage, perPage)}
                                                     text="" />
                                             </TableCell>
+
+
+
+
+
+
                                             <TableCell className="font-medium">
                                                 <AppFormCombobox
                                                     form={form}

@@ -13,25 +13,79 @@ type props = {
     text?: string,
     textFieldName: string,
     valueFieldName: string,
-    selectItems: SelectItemType[],
+    selectItems?: SelectItemType[],
     onSelectCommandItem?: () => void,
     onClickXButton?: () => void,
     isShowText?: boolean,
     align?: 'vertical' | 'horizontal',
     labelCSS?: string,
+    onScrollFun?: (currentPage?: number, perPage?: number) => Promise<any>
 }
 
 export default function AppFormCombobox(
     { text, isShowText = true, textFieldName, valueFieldName, form, selectItems, onSelectCommandItem, onClickXButton,
-        align = 'vertical', labelCSS = "w-16" }: props) {
-
+        align = 'vertical', labelCSS = "w-16", onScrollFun }: props) {
     const [openPaymentMethod, setOpenPaymentMethod] = React.useState(false)
     const [paymentMethods, setPaymentMethods] = React.useState<SelectItemType[]>([])
+    const [page, setPage] = React.useState(1);
+    const [isLoadingRef, setIsLoadingRef] = React.useState(false);
+    const scrollTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
     React.useEffect(() => {
-        setPaymentMethods(selectItems);
+        if (selectItems) {
+            setPaymentMethods(selectItems);
+        }
     }, [selectItems])
-    console.log(textFieldName, form.getValues(textFieldName))
-    console.log(textFieldName, paymentMethods)
+
+    function getData() {
+        if (onScrollFun && !isLoadingRef) {
+            setIsLoadingRef(true);
+            onScrollFun(page, 10).then(res => {
+                const da = res?.map((_: any) => ({ label: _["name"]?.toString(), value: _["id"]?.toString() })) ?? []
+                if (page == 1) {
+                    setPaymentMethods(da);
+                } else {
+                    setPaymentMethods(prev => {
+                        const merged = [...prev, ...da];
+                        const unique = [...new Set(merged)];
+                        return unique;
+                    });
+                }
+                setIsLoadingRef(false);
+                console.log('da',)
+            }).catch(() => {
+                setIsLoadingRef(false);
+            });
+        }
+        else console.log('unde')
+    }
+    console.log('paymentMethods', paymentMethods)
+
+    React.useEffect(() => {
+        getData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page]);
+
+
+    const handleScroll = (e: any) => {
+        if (onScrollFun) {
+            const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+            // Reached bottom
+            if (scrollTop + clientHeight >= scrollHeight - 5) {
+                // Debounce rapid scroll events
+                if (scrollTimeoutRef.current) {
+                    clearTimeout(scrollTimeoutRef.current);
+                }
+                scrollTimeoutRef.current = setTimeout(() => {
+                    setPage((prev) => prev + 1);
+                    scrollTimeoutRef.current = null;
+                }, 150);
+            }
+        }
+    };
+    // console.log('prev', page)
+
     return (
         <FormField
             control={form.control}
@@ -63,7 +117,7 @@ export default function AppFormCombobox(
                                             size={"sm"}
                                         >
                                             {field.value
-                                                ? paymentMethods.find(
+                                                ? paymentMethods?.find(
                                                     (language) => language.value === field.value?.toString()
                                                 )?.label
                                                 : `Select ${text?.toLowerCase()}`}
@@ -89,10 +143,12 @@ export default function AppFormCombobox(
                                         placeholder={`Search ${text?.toLowerCase()}...`}
                                         className="h-9"
                                     />
-                                    <CommandList>
+                                    <CommandList onScroll={(e) => {
+                                        handleScroll(e)
+                                    }}>
                                         <CommandEmpty>No ${text?.toLowerCase()} found.</CommandEmpty>
                                         <CommandGroup>
-                                            {paymentMethods.map((language) => (
+                                            {paymentMethods?.map((language) => (
                                                 <CommandItem
                                                     value={language.label}
                                                     key={language.value}
