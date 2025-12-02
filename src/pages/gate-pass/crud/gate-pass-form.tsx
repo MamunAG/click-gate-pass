@@ -528,8 +528,6 @@ export default function GatePassForm({
                                             </TableCell>
 
 
-
-
                                             <TableCell className="font-medium">
                                                 <AppFormCombobox
                                                     form={form}

@@ -73,7 +73,7 @@ export function GetAllMaterial() {
 
 export function GetAllMaterialWithPagination({ axios, search, currentPage, perPage }: { axios: AxiosInstance, search: string, currentPage: number, perPage: number }) {
     const getData = async (): Promise<any> =>
-        (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}&search=${search}`)).data;
+        (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}&name=${search}`)).data;
 
     return getData().then((res: any) => {
         console.log('item', res);
