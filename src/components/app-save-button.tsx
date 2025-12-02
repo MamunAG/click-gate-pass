@@ -13,7 +13,7 @@ export default function AppSaveButton({ pageAction, mutationIsPending: isPending
     return (
         <Button
             type="submit"
-            disabled={isPending ? true : isLoading}
+            disabled={isPending || isLoading}
             className={cn(
                 "w-24",
                 (pageAction === PageAction.view ? "hidden" : " "), 'cursor-pointer'
