@@ -74,9 +74,13 @@ export default function AppFormCombobox(
     }, [page]);
 
     React.useEffect(() => {
+
         if (!onScrollFun) {
             return;
         }
+
+        setPage(1);
+
         if (!search) {
             startTransition(() => {
                 setIsSearching(false);
