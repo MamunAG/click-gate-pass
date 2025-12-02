@@ -10,7 +10,8 @@ import { ThemeProvider } from './components/theme-provider'
 import LoginPage from './pages/login/page'
 import SignupPage from './pages/signup/page'
 // import Layout from './layout'
-import FactoryWiseMenuPermissionList from './pages/factory-wise-menu-permission/factory-wise-menu-permission-index';
+import FactoryWiseMenuPermissionList from './pages/factory-wise-menu-permission/index-page/factory-wise-menu-permission-list';
+import FactoryWiseMenuPermissionIndex from './pages/factory-wise-menu-permission/factory-wise-menu-permission-index';
 
 const queryClient = new QueryClient()
 function App() {
@@ -40,15 +41,13 @@ function App() {
                                                 <GatePassCRUD />
                                             </>
                                         }
-
-
                                     />
                                 </Route>
-                                <Route path="factory-wise-menu-permission-index">
+                                <Route path="factory-wise-menu-permission">
                                     <Route index element={
                                         <>
-                                            <PageTitle title="Factory Wise Menu Permission" />
-                                            <FactoryWiseMenuPermissionList />
+                                            <PageTitle title="Factory Wise Menu Permission List" />
+                                            <FactoryWiseMenuPermissionIndex />
                                         </>
                                     }
                                     />

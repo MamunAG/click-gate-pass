@@ -15,8 +15,6 @@ export interface IFactoryPermission {
 }
 
 
-const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-
 
 export function GetAllFactoryPermissions() {
 
