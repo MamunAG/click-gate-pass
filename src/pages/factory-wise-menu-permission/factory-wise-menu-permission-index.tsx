@@ -1,13 +1,28 @@
 import BreadcrumbAddNew from '@/components/Breadcrumbs/Breadcrumb-add-new';
 import { PageAction } from '@/utility/page-actions';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import FactoryWiseMenuPermissionList from './index-page/factory-wise-menu-permission-list';
+import { FactoryWiseMenuPermissionIndexTable } from './index-page/factory-wise-menu-permission-list-table';
+import { IFacotryWiseMenuPermissionIndex } from './index-page/factory-wise-menu-permission-index-dto';
+import { GetAllFactoryPermissions } from './factory-wise-menu-permission-service';
 
 export default function FactoryWiseMenuPermissionIndex() {
 
+    const [FactoryWiseMenuPermissionListData, setFactoryWiseMenuPermissionListDataData] = useState<IFacotryWiseMenuPermissionIndex[]>([]);
+    const { data, isLoading } = GetAllFactoryPermissions();
 
-
+    useEffect(() => {
+        if (!data) return;
+        const formatted: IFacotryWiseMenuPermissionIndex[] = data.map(item => ({
+            companyId: item.COMPANY_ID,
+            companyName: item.FACTORY_NAME,
+            noOfModule: item.NO_OF_MODULE,
+            noOfMenu: item.NO_OF_MENU,
+            createdBy: item.CREATED_BY,
+            updatedBy: item.UPDATE_BY
+        }));
+        setFactoryWiseMenuPermissionListDataData(formatted);
+    }, [data]);
 
 
     const navigator = useNavigate();
@@ -18,7 +33,7 @@ export default function FactoryWiseMenuPermissionIndex() {
                 handleNavigateToAddNewPage={() => navigator(`${PageAction.add}/0`)} />
 
             <div>
-                <FactoryWiseMenuPermissionList />
+                <FactoryWiseMenuPermissionIndexTable data={FactoryWiseMenuPermissionListData} />
             </div>
         </div>
     )

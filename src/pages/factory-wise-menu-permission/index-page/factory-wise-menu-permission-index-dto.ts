@@ -3,6 +3,6 @@ export type IFacotryWiseMenuPermissionIndex = {
     companyName: string,
     noOfModule: string,
     noOfMenu: string,
-    createdBy: string,
-    updatedBy: string,
+    createdBy: string | null,
+    updatedBy: string | null,
 }
