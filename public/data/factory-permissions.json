@@ -1,0 +1,18 @@
+[
+    {
+        "COMPANY_ID": 1,
+        "FACTORY_NAME": "International Classic Composite Ltd.",
+        "NO_OF_MODULE": "2",
+        "NO_OF_MENU": "17",
+        "CREATED_BY": null,
+        "UPDATE_BY": null
+    },
+    {
+        "COMPANY_ID": 2,
+        "FACTORY_NAME": "Demo Company",
+        "NO_OF_MODULE": "2",
+        "NO_OF_MENU": "5",
+        "CREATED_BY": null,
+        "UPDATE_BY": null
+    }
+]

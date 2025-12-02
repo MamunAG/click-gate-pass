@@ -6,6 +6,7 @@ import {
     BookOpen,
     Bot,
     Command,
+    FactoryIcon,
     Frame,
     GalleryVerticalEnd,
     Map,
@@ -69,6 +70,18 @@ const data = {
                 {
                     title: "Settings",
                     url: "#",
+                },
+            ],
+        },
+        {
+            title: "Factory Wise Menu Permission",
+            url: "#",
+            icon: FactoryIcon,
+            // isActive: true,
+            items: [
+                {
+                    title: "Factory Wise Menu Permission",
+                    url: "/dashboard/factory-wise-menu-permission-index",
                 },
             ],
         },
