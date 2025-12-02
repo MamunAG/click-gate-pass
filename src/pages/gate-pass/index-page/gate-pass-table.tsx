@@ -23,16 +23,6 @@ export function GatePassTable({ data }: { data: IGatePassIndex[] }) {
       searchPlaceholder="Search gate passes..."
       pageSize={10}
       pageSizeOptions={[5, 10, 20, 50]}
-      onRowClick={(row) => {
-        console.log("Clicked row:", row);
-      }}
-      onSelectionChange={(selectedRows) => {
-        console.log("Selected:", selectedRows.length);
-      }}
-      onDragEnd={(oldIndex, newIndex, reorderedData) => {
-        console.log(`Moved item from ${oldIndex} to ${newIndex}`);
-        console.log("New order:", reorderedData);
-      }}
     />
   );
 }

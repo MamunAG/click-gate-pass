@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as React from "react"
+import * as React from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -11,7 +11,7 @@ import {
   type SortingState,
   useReactTable,
   type VisibilityState,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 import {
   closestCenter,
   DndContext,
@@ -22,38 +22,33 @@ import {
   useSensors,
   type DragEndEvent,
   type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { 
-  ChevronDown, 
-  Search,
-  X,
-  type LucideIcon 
-} from "lucide-react"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { ChevronDown, Search, X, type LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -61,103 +56,91 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 // Import helper functions from separate file
-import { createSelectColumn, createActionsColumn, createDragColumn } from "./table-helpers"
+import {
+  createSelectColumn,
+  createActionsColumn,
+  createDragColumn,
+} from "./table-helpers";
 
-//  TYPES 
+//  TYPES
 export interface TableAction<TData = any> {
-  label: string
-  onClick: (row: TData) => void | Promise<void>
-  icon?: LucideIcon
-  variant?: "default" | "destructive"
-  show?: (row: TData) => boolean
+  label: string;
+  onClick: (row: TData) => void | Promise<void>;
+  icon?: LucideIcon;
+  variant?: "default" | "destructive";
+  show?: (row: TData) => boolean;
 }
 
 export interface BulkAction<TData = any> {
-  label: string
-  onClick: (selectedRows: TData[]) => void | Promise<void>
-  icon?: LucideIcon
-  variant?: "default" | "destructive"
+  label: string;
+  onClick: (selectedRows: TData[]) => void | Promise<void>;
+  icon?: LucideIcon;
+  variant?: "default" | "destructive";
 }
 
 export interface FilterConfig {
-  columnId: string
-  placeholder?: string
-  type?: "text" | "search"
+  columnId: string;
+  placeholder?: string;
+  type?: "text" | "search";
 }
 
 export interface AppDataTableProps<TData = any> {
   // Core Props
-  data: TData[]
-  columns: ColumnDef<TData>[]
-  
+  data: TData[];
+  columns: ColumnDef<TData>[];
+
   // Table Features
-  enableSelection?: boolean
-  enableSorting?: boolean
-  enableGlobalFilter?: boolean
-  enablePagination?: boolean
-  enableColumnVisibility?: boolean
-  enableDragAndDrop?: boolean
-  
+  enableSelection?: boolean;
+  enableSorting?: boolean;
+  enableGlobalFilter?: boolean;
+  enablePagination?: boolean;
+  enableColumnVisibility?: boolean;
+  enableDragAndDrop?: boolean;
+
   // Actions
-  rowActions?: TableAction<TData>[]
-  bulkActions?: BulkAction<TData>[]
-  
+  rowActions?: TableAction<TData>[];
+  bulkActions?: BulkAction<TData>[];
+
   // Filtering
-  searchPlaceholder?: string
-  columnFilters?: FilterConfig[]
-  
+  searchPlaceholder?: string;
+  columnFilters?: FilterConfig[];
+
   // Pagination
-  pageSize?: number
-  pageSizeOptions?: number[]
-  showPaginationInfo?: boolean
-  
+  pageSize?: number;
+  pageSizeOptions?: number[];
+  showPaginationInfo?: boolean;
+
   // Styling
-  className?: string
-  tableClassName?: string
-  
+  className?: string;
+  tableClassName?: string;
+
   // Loading & Empty States
-  isLoading?: boolean
-  loadingText?: string
-  emptyText?: string
-  
-  // Events
-  onRowClick?: (row: TData) => void
-  onSelectionChange?: (selectedRows: TData[]) => void
-  onDragEnd?: (oldIndex: number, newIndex: number, reorderedData: TData[]) => void
+  isLoading?: boolean;
+  loadingText?: string;
+  emptyText?: string;
 }
 
 // ================== DRAGGABLE ROW COMPONENT ==================
-interface DraggableRowProps<TData> {
-  row: any
-  onRowClick?: (row: TData) => void
-}
 
-function DraggableRow<TData>({ 
-  row, 
-  onRowClick 
-}: DraggableRowProps<TData>) {
+function DraggableRow({ row }: any) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
-  })
+  });
 
   return (
     <TableRow
       data-state={row.getIsSelected() && "selected"}
       data-dragging={isDragging}
       ref={setNodeRef}
-      className={cn(
-        "relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80",
-        onRowClick && "cursor-pointer hover:bg-muted/50"
-      )}
+      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
       style={{
         transform: CSS.Transform.toString(transform),
         transition: transition,
       }}
-      onClick={() => onRowClick?.(row.original)}
     >
       {row.getVisibleCells().map((cell: any) => (
         <TableCell key={cell.id}>
@@ -165,7 +148,7 @@ function DraggableRow<TData>({
         </TableCell>
       ))}
     </TableRow>
-  )
+  );
 }
 
 // ================== MAIN COMPONENT ==================
@@ -189,86 +172,76 @@ export function AppDataTable<TData>({
   isLoading = false,
   loadingText = "Loading...",
   emptyText = "No data available.",
-  onRowClick,
-  onSelectionChange,
-  onDragEnd,
 }: AppDataTableProps<TData>) {
-  
   // ========== STATE ==========
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [globalFilter, setGlobalFilter] = React.useState("")
-  const [tableData, setTableData] = React.useState(data)
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [tableData, setTableData] = React.useState(data);
 
   // ========== DRAG AND DROP SETUP ==========
-  const sortableId = React.useId()
+  const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
-  )
+  );
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(() => {
-    if (!enableDragAndDrop) return []
-    return tableData?.map((item: any) => item.id) || []
-  }, [tableData, enableDragAndDrop])
+    if (!enableDragAndDrop) return [];
+    return tableData?.map((item: any) => item.id) || [];
+  }, [tableData, enableDragAndDrop]);
 
   // Update table data when external data changes
   React.useEffect(() => {
-    setTableData(data)
-  }, [data])
+    setTableData(data);
+  }, [data]);
 
-  // ========== ENHANCED COLUMNS ==========
   const columns = React.useMemo(() => {
-    const cols = [...initialColumns]
-    
-    // Add selection column if enabled (must be first so drag is leftmost)
+    const cols = [...initialColumns];
+
     if (enableSelection) {
-      cols.unshift(createSelectColumn<TData>())
+      cols.unshift(createSelectColumn<TData>());
     }
-    
-    // Add drag column if enabled (added after selection so it appears on left)
+
     if (enableDragAndDrop) {
-      cols.unshift(createDragColumn<TData>())
+      cols.unshift(createDragColumn<TData>());
     }
-    
-    // Add actions column if actions are provided
+
     if (rowActions && rowActions.length > 0) {
-      cols.push(createActionsColumn<TData>(rowActions))
+      cols.push(createActionsColumn<TData>(rowActions));
     }
-    
-    return cols
-  }, [initialColumns, enableSelection, enableDragAndDrop, rowActions])
+
+    return cols;
+  }, [initialColumns, enableSelection, enableDragAndDrop, rowActions]);
 
   // ========== DRAG HANDLER ==========
-  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
-    const { active, over } = event
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
     if (active && over && active.id !== over.id) {
-      const oldIndex = dataIds.indexOf(active.id)
-      const newIndex = dataIds.indexOf(over.id)
-      
-      const reorderedData = arrayMove(tableData, oldIndex, newIndex)
-      setTableData(reorderedData)
-      
-      // Call external handler if provided
-      if (onDragEnd) {
-        onDragEnd(oldIndex, newIndex, reorderedData)
-      }
+      setTableData((data) => {
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
     }
-  }, [dataIds, tableData, onDragEnd])
+  }
 
   // ========== TABLE INSTANCE ==========
-  // Note: TanStack Table useReactTable returns functions that cannot be memoized safely
-  // This is expected behavior and does not cause issues in practice
   const table = useReactTable({
     data: enableDragAndDrop ? tableData : data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
+    getPaginationRowModel: enablePagination
+      ? getPaginationRowModel()
+      : undefined,
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -286,27 +259,20 @@ export function AppDataTable<TData>({
         pageSize,
       },
     },
-  })
+  });
 
-  // ========== EFFECTS ==========
-  React.useEffect(() => {
-    if (onSelectionChange) {
-      const selectedRows = table.getFilteredSelectedRowModel().rows.map(row => row.original)
-      onSelectionChange(selectedRows)
-    }
-  }, [rowSelection, onSelectionChange, table])
 
   // ========== COMPUTED VALUES ==========
-  const selectedRows = table.getFilteredSelectedRowModel().rows.map(row => row.original)
-  const hasSelectedRows = selectedRows.length > 0
+  const selectedRows = table
+    .getFilteredSelectedRowModel()
+    .rows.map((row) => row.original);
+  const hasSelectedRows = selectedRows.length > 0;
 
   return (
     <div className={cn("w-full space-y-4", className)}>
-      
       {/* ========== TOOLBAR ========== */}
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
-          
           {/* Global Search */}
           {enableGlobalFilter && (
             <div className="relative">
@@ -332,13 +298,13 @@ export function AppDataTable<TData>({
           {/* Bulk Actions */}
           {bulkActions && hasSelectedRows && (
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary">
-                {selectedRows.length} selected
-              </Badge>
+              <Badge variant="secondary">{selectedRows.length} selected</Badge>
               {bulkActions.map((action, index) => (
                 <Button
                   key={index}
-                  variant={action.variant === "destructive" ? "destructive" : "outline"}
+                  variant={
+                    action.variant === "destructive" ? "destructive" : "outline"
+                  }
                   size="sm"
                   onClick={() => action.onClick(selectedRows)}
                 >
@@ -367,7 +333,9 @@ export function AppDataTable<TData>({
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -387,71 +355,131 @@ export function AppDataTable<TData>({
             sensors={sensors}
             id={sortableId}
           >
-            <Table className={tableClassName}>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {loadingText}
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              enableDragAndDrop ? (
-                <SortableContext
-                  items={dataIds}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {table.getRowModel().rows.map((row) => (
-                    <DraggableRow
-                      key={row.id}
-                      row={row}
-                      onRowClick={onRowClick}
-                    />
-                  ))}
-                </SortableContext>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                      onRowClick && "cursor-pointer hover:bg-muted/50"
-                    )}
-                    onClick={() => onRowClick?.(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+            <Table>
+              <TableHeader className="bg-muted sticky top-0 z-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              )
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {emptyText}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+                ))}
+              </TableHeader>
+              <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                {table.getRowModel().rows?.length ? (
+                  <SortableContext
+                    items={dataIds}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {table.getRowModel().rows.map((row) => (
+                      <DraggableRow key={row.id} row={row} />
+                    ))}
+                  </SortableContext>
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </DndContext>
         ) : (
+          // <DndContext
+          //   collisionDetection={closestCenter}
+          //   modifiers={[restrictToVerticalAxis]}
+          //   onDragEnd={handleDragEnd}
+          //   sensors={sensors}
+          //   id={sortableId}
+          // >
+          //   <Table className={tableClassName}>
+          //     <TableHeader>
+          //       {table.getHeaderGroups().map((headerGroup) => (
+          //         <TableRow key={headerGroup.id}>
+          //           {headerGroup.headers.map((header) => (
+          //             <TableHead key={header.id}>
+          //               {header.isPlaceholder
+          //                 ? null
+          //                 : flexRender(
+          //                     header.column.columnDef.header,
+          //                     header.getContext()
+          //                   )}
+          //             </TableHead>
+          //           ))}
+          //         </TableRow>
+          //       ))}
+          //     </TableHeader>
+
+          //     <TableBody>
+          //       {isLoading ? (
+          //         <TableRow>
+          //           <TableCell
+          //             colSpan={columns.length}
+          //             className="h-24 text-center"
+          //           >
+          //             {loadingText}
+          //           </TableCell>
+          //         </TableRow>
+          //       ) : table.getRowModel().rows?.length ? (
+          //         enableDragAndDrop ? (
+          //           <SortableContext
+          //             items={dataIds}
+          //             strategy={verticalListSortingStrategy}
+          //           >
+          //             {table.getRowModel().rows.map((row) => (
+          //               <DraggableRow
+          //                 key={row.id}
+          //                 row={row}
+          //               />
+          //             ))}
+          //           </SortableContext>
+          //         ) : (
+          //           table.getRowModel().rows.map((row) => (
+          //             <TableRow
+          //               key={row.id}
+          //               data-state={row.getIsSelected() && "selected"}
+          //               className={cn(
+          //                 onRowClick && "cursor-pointer hover:bg-muted/50"
+          //               )}
+          //               onClick={() => onRowClick?.(row.original)}
+          //             >
+          //               {row.getVisibleCells().map((cell) => (
+          //                 <TableCell key={cell.id}>
+          //                   {flexRender(
+          //                     cell.column.columnDef.cell,
+          //                     cell.getContext()
+          //                   )}
+          //                 </TableCell>
+          //               ))}
+          //             </TableRow>
+          //           ))
+          //         )
+          //       ) : (
+          //         <TableRow>
+          //           <TableCell
+          //             colSpan={columns.length}
+          //             className="h-24 text-center"
+          //           >
+          //             {emptyText}
+          //           </TableCell>
+          //         </TableRow>
+          //       )}
+          //     </TableBody>
+          //   </Table>
+          // </DndContext>
           <Table className={tableClassName}>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -460,17 +488,23 @@ export function AppDataTable<TData>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
               ))}
             </TableHeader>
-            
+
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     {loadingText}
                   </TableCell>
                 </TableRow>
@@ -480,20 +514,25 @@ export function AppDataTable<TData>({
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
-                      onRowClick && "cursor-pointer hover:bg-muted/50"
+                     "cursor-pointer hover:bg-muted/50"
                     )}
-                    onClick={() => onRowClick?.(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     {emptyText}
                   </TableCell>
                 </TableRow>
@@ -506,7 +545,6 @@ export function AppDataTable<TData>({
       {/* ========== PAGINATION ========== */}
       {enablePagination && (
         <div className="flex items-center justify-between px-2">
-          
           {/* Selection Info */}
           {showPaginationInfo && (
             <div className="flex-1 text-sm text-muted-foreground">
@@ -520,7 +558,6 @@ export function AppDataTable<TData>({
           )}
 
           <div className="flex items-center space-x-6 lg:space-x-8">
-            
             {/* Page Size Selector */}
             <div className="flex items-center space-x-2">
               <p className="text-sm font-medium">Rows per page</p>
@@ -529,7 +566,9 @@ export function AppDataTable<TData>({
                 onValueChange={(value) => table.setPageSize(Number(value))}
               >
                 <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue placeholder={table.getState().pagination.pageSize} />
+                  <SelectValue
+                    placeholder={table.getState().pagination.pageSize}
+                  />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {pageSizeOptions.map((pageSize) => (
@@ -590,5 +629,5 @@ export function AppDataTable<TData>({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -25,9 +25,6 @@ export function createDragColumn<TData = any>(): ColumnDef<TData> {
     id: "drag",
     header: () => null,
     cell: ({ row }) => <DragHandle id={(row.original as any)?.id || row.id} />,
-    enableSorting: false,
-    enableHiding: false,
-    size: 40,
   }
 }
 
