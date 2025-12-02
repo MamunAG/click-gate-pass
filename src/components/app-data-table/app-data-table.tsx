@@ -224,14 +224,14 @@ export function AppDataTable<TData>({
   const columns = React.useMemo(() => {
     const cols = [...initialColumns]
     
-    // Add drag column if enabled (must be first)
-    if (enableDragAndDrop) {
-      cols.unshift(createDragColumn<TData>())
-    }
-    
-    // Add selection column if enabled
+    // Add selection column if enabled (must be first so drag is leftmost)
     if (enableSelection) {
       cols.unshift(createSelectColumn<TData>())
+    }
+    
+    // Add drag column if enabled (added after selection so it appears on left)
+    if (enableDragAndDrop) {
+      cols.unshift(createDragColumn<TData>())
     }
     
     // Add actions column if actions are provided
