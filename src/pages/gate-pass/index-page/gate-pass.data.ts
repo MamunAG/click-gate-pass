@@ -13,7 +13,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "2",
         sl: 2,
         date: "10-NOV-2025",
         createdBy: "Md. Nasir Uddin",
@@ -24,7 +24,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "3",
         sl: 3,
         date: "15-NOV-2025",
         createdBy: "Abu jafor",
@@ -35,7 +35,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Zakir"
     },
     {
-        id: "1",
+        id: "4",
         sl: 4,
         date: "20-NOV-2025",
         createdBy: "Md. Parves Prantik",
@@ -46,7 +46,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "5",
         sl: 5,
         date: "22-NOV-2025",
         createdBy: "Jobaer Ahmed",
@@ -57,7 +57,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "6",
         sl: 6,
         date: "25-NOV-2025",
         createdBy: "Rabeya Akter",
@@ -68,7 +68,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Zakir"
     },
     {
-        id: "1",
+        id: "7",
         sl: 7,
         date: "26-NOV-2025",
         createdBy: "Jobaer Ahmed",
@@ -79,7 +79,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "8",
         sl: 8,
         date: "30-NOV-2025",
         createdBy: "Md. Laium Hossen",
@@ -90,7 +90,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "9",
         sl: 9,
         date: "29-NOV-2025",
         createdBy: "Abu jafor",
@@ -101,7 +101,7 @@ export const GatePassData: IGatePassIndex[] = [
         aprvBy: "Moni"
     },
     {
-        id: "1",
+        id: "10",
         sl: 10,
         date: "27-NOV-2025",
         createdBy: "Abu jafor",
