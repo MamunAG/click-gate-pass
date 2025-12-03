@@ -64,6 +64,8 @@ export default function AuthProvider({
   const api = useApiUrl();
 
   const loginAction = async (data: { username: string; password: string }) => {
+    console.log(data)
+
     try {
       setIsLoading(true);
       setMessage(null);
@@ -73,7 +75,7 @@ export default function AuthProvider({
         Email: data.username,
         Password: data.password,
       };
-
+      console.log(authData)
       const response = await axios.post(
         `${api.ProductionRootUrl}/api/account/login`,
         authData

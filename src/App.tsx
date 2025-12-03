@@ -7,8 +7,8 @@ import PageTitle from './components/PageTitle'
 import Home from './pages/home'
 import Layout from './layout'
 import { ThemeProvider } from './components/theme-provider'
-import LoginPage from './pages/login/page'
-import SignupPage from './pages/signup/page'
+import LoginPage from './pages/auth/login/login-index'
+import SignupPage from './pages/auth/signup/signup-index'
 // import Layout from './layout'
 import FactoryWiseMenuPermissionIndex from './pages/factory-wise-menu-permission/factory-wise-menu-permission-index';
 import FactoryWiseMenuPermissionCRUD from './pages/factory-wise-menu-permission/curd/factory-wise-menu-permission-crud-index';
@@ -22,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/">
               <Route index element={<LoginPage />} />
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/dashboard" element={<Layout />}>
                 <Route index element={<Home />} />
