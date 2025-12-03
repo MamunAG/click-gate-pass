@@ -410,8 +410,10 @@ export function AppDataTable<TData>({
 
             {/* Page Info */}
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+              {table.getPageCount() === 0 
+                ? "No pages" 
+                : `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`
+              }
             </div>
 
             {/* Navigation Buttons */}
