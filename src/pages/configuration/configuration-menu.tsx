@@ -1,7 +1,7 @@
 import { ModuleIcons } from "@/components/module-icon";
 import { INavMenu } from "@/components/nav-main";
-import FactoryWiseMenuPermissionIndex from "../factory-wise-menu-permission/factory-wise-menu-permission-index";
-import FactoryWiseMenuPermissionCRUD from "../factory-wise-menu-permission/curd/factory-wise-menu-permission-crud-index";
+import FactoryWiseMenuPermissionIndex from "./factory-wise-menu-permission/factory-wise-menu-permission-index";
+import FactoryWiseMenuPermissionCRUD from "./factory-wise-menu-permission/curd/factory-wise-menu-permission-crud-index";
 
 export const ConfigurationMenu: INavMenu =
 {
@@ -10,7 +10,7 @@ export const ConfigurationMenu: INavMenu =
     icon: ModuleIcons.MasterSettings,
     items: [
         {
-            title: "Basic Setupe",
+            title: "Basic Setup",
             isMeuItem: true,
             items: [
                 {
