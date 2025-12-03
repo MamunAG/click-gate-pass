@@ -2,9 +2,8 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { flexRender } from "@tanstack/react-table";
-
 import { TableCell, TableRow } from "../ui/table";
-import { getCommonPinningStyles } from "./pinned-column";
+import { GetCommonPinningStyles } from "./pinned-column";
 
 export function DraggableRow({ row }: any) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -25,7 +24,7 @@ export function DraggableRow({ row }: any) {
       {row.getVisibleCells().map((cell: any) => {
         const { column } = cell;
         return (
-          <TableCell key={cell.id}   style={{ ...getCommonPinningStyles(column) }}>
+          <TableCell key={cell.id}   style={{ ...GetCommonPinningStyles(column) }}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </TableCell>
         );

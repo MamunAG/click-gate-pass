@@ -63,18 +63,7 @@ import {
 import { DraggableRow } from "./draggable-row";
 import { useState } from "react";
 import { AppDataTableProps } from "./types";
-import { getCommonPinningStyles } from "./pinned-column";
-
-// const getCommonPinningStyles = (column: Column<any>): React.CSSProperties => {
-//   const isPinned = column.getIsPinned();
-//   return {
-//     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
-//     opacity: isPinned ? 1 : 1,
-//     position: isPinned ? "sticky" : "relative",
-//     width: column.getSize(),
-//     zIndex: isPinned ? 1 : 0,
-//   };
-// };
+import { GetCommonPinningStyles } from "./pinned-column";
 
 export function AppDataTable<TData>({
   data,
@@ -287,7 +276,7 @@ export function AppDataTable<TData>({
                         <TableHead
                           key={header.id}
                           colSpan={header.colSpan}
-                          style={{ ...getCommonPinningStyles(column) }}
+                          style={{ ...GetCommonPinningStyles(column) }}
                         >
                           {header.isPlaceholder
                             ? null
@@ -295,6 +284,41 @@ export function AppDataTable<TData>({
                                 header.column.columnDef.header,
                                 header.getContext()
                               )}
+                          {!header.isPlaceholder &&
+                            header.column.getCanPin() && (
+                              <div className="flex gap-1 justify-center">
+                                {header.column.getIsPinned() !== "left" ? (
+                                  <button
+                                    className="border rounded px-2"
+                                    onClick={() => {
+                                      header.column.pin("left");
+                                    }}
+                                  >
+                                    {"<="}
+                                  </button>
+                                ) : null}
+                                {header.column.getIsPinned() ? (
+                                  <button
+                                    className="border rounded px-2"
+                                    onClick={() => {
+                                      header.column.pin(false);
+                                    }}
+                                  >
+                                    X
+                                  </button>
+                                ) : null}
+                                {header.column.getIsPinned() !== "right" ? (
+                                  <button
+                                    className="border rounded px-2"
+                                    onClick={() => {
+                                      header.column.pin("right");
+                                    }}
+                                  >
+                                    {"=>"}
+                                  </button>
+                                ) : null}
+                              </div>
+                            )}
                         </TableHead>
                       );
                     })}
@@ -360,14 +384,20 @@ export function AppDataTable<TData>({
                     data-state={row.getIsSelected() && "selected"}
                     className={cn("cursor-pointer hover:bg-muted/50")}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const { column } = cell;
+                      return (
+                        <TableCell 
+                          key={cell.id}
+                          style={{ ...GetCommonPinningStyles(column) }}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (
