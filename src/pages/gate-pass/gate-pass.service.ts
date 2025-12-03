@@ -71,6 +71,16 @@ export function GetAllMaterial() {
     return query;
 }
 
+export function GetAllMaterialWithPagination({ axios, search, currentPage, perPage }: { axios: AxiosInstance, search: string, currentPage: number, perPage: number }) {
+    const getData = async (): Promise<any> =>
+        (await axios.get(`/production/material-info/paged?currentPage=${currentPage}&perPage=${perPage}&name=${search}`)).data;
+
+    return getData().then((res: any) => {
+        console.log('item', res);
+        return res.data;
+    });
+}
+
 export async function GetAllGatePass(axios: AxiosInstance, gatepassTypeId: number): Promise<IApiResponseType<IGatePassSaveDto[]>> {
     const companyId = localStorage.getItem(localStorageKey.selectedCompany);
     const response = await axios.get(`/${companyId}/accounting/gatepass?gatepassTypeId=${gatepassTypeId}`);
@@ -85,15 +95,6 @@ export async function GetGatePassById(axios: AxiosInstance, id: number): Promise
 
 export async function Save(GatePassType: IGatePassSaveDto, axios: AxiosInstance) {
     const companyId = localStorage.getItem(localStorageKey.selectedCompany);
-    const { sender: NAME } = GatePassType;
-
-    if (!NAME) {
-        throw new Error("Supplier Name is required");
-    }
-    if (NAME.length < 2) {
-        throw new Error("GatePass name must be at least 2 character.");
-    }
-
     const response = await axios.post(`/${companyId}/accounting/GatePass`, GatePassType);
 
     if (!response) {

@@ -15,13 +15,50 @@ import {
     FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
+import React from "react"
+import { AuthContextType, useAuth } from "@/lib/auth-provider"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
+    const [input, setInput] = React.useState({
+        username: "",
+        password: "",
+    });
+    const [isLoading, setIsLoading] = React.useState(false);
+    const auth: AuthContextType | null = useAuth();
+
+    const handleSubmitEvent = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+
+            setIsLoading(true);
+
+            if (input.username !== "" && input.password !== "") {
+                await auth?.loginAction(input);
+                setIsLoading(false);
+                return;
+            }
+            alert("pleae provide a valid input");
+            setIsLoading(false);
+        } catch {
+            setIsLoading(false);
+        }
+    };
+
+    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+        const { name, value } = e.target;
+        setInput((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+    console.log(input);
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -32,7 +69,7 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={() => navigate("/dashboard")}>
+                    <form onSubmit={handleSubmitEvent}>
                         <FieldGroup>
                             <Field>
                                 <Button variant="outline" type="button">
@@ -58,12 +95,13 @@ export function LoginForm({
                                 Or continue with
                             </FieldSeparator>
                             <Field>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <FieldLabel htmlFor="username">User Name</FieldLabel>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="m@example.com"
-                                    value={"najmuzzaman@clickerp.com.bd"}
+                                    id="username"
+                                    name="username"
+                                    placeholder="Input your user name"
+                                    value={input.username}
+                                    onChange={handleInput}
                                     required
                                 />
                             </Field>
@@ -77,10 +115,18 @@ export function LoginForm({
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input id="password" type="password" required value={12345678} />
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    value={input.password}
+                                    onChange={handleInput}
+                                    placeholder="Input your user password"
+                                    required
+                                />
                             </Field>
                             <Field>
-                                <Button type="submit">Login</Button>
+                                <Button type="submit" className="hover:cursor-pointer" disabled={isLoading}>Login</Button>
                                 <FieldDescription className="text-center">
                                     Don&apos;t have an account? <Link to="/signup">Sign up</Link>
                                 </FieldDescription>
