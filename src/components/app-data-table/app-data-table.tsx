@@ -27,10 +27,8 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { ChevronDown, Search, X, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -65,7 +63,9 @@ import {
   createActionsColumn,
   createDragColumn,
 } from "./table-helpers";
+
 import { useState } from "react";
+import { DraggableRow } from "./draggable-row";
 
 //  TYPES
 export interface TableAction<TData = any> {
@@ -125,34 +125,7 @@ export interface AppDataTableProps<TData = any> {
   emptyText?: string;
 }
 
-// ================== DRAGGABLE ROW COMPONENT ==================
-
-function DraggableRow({ row }: any) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
-  });
-
-  return (
-    <TableRow
-      data-state={row.getIsSelected() && "selected"}
-      data-dragging={isDragging}
-      ref={setNodeRef}
-      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition,
-      }}
-    >
-      {row.getVisibleCells().map((cell: any) => (
-        <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
-    </TableRow>
-  );
-}
-
-// ================== MAIN COMPONENT ==================
+// Main Component
 export function AppDataTable<TData>({
   data,
   columns: initialColumns,
