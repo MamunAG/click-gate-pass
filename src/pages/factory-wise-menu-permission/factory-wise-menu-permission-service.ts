@@ -26,6 +26,14 @@ export interface ICompany {
     companyTypeId: number;
 }
 
+export interface ModuleItem {
+    id: number;
+    name: string;
+    parentMenuName: string;
+    moduleName: string;
+    moduleId: number;
+}
+
 
 
 export function GetAllFactoryPermissions() {
@@ -79,6 +87,30 @@ export function GetCompanyTypes(companyId: number) {
         queryKey: ["CompanyTypes", companyId],
         queryFn: getData,
         enabled: !!companyId,
+        staleTime: 1000 * 10,
+    });
+    return query;
+}
+
+
+
+export function GetMenusByModuleIdZero(companyId: number, tableHasData: boolean) {
+    const axios = useAxiosInstance();
+    const getData = async (): Promise<ModuleItem[]> => {
+        const res = await axios.get(`production/${companyId}/Menu/get-all-menu?moduleId=0`);
+        const data: ModuleItem[] = res.data.map((item: any) => ({
+            id: item.ID,
+            name: item.MENUNAME,
+            parentMenuName: item.MAINMENU,
+            moduleName: item.MODULE_NAME,
+            moduleId: item.MODUELID,
+        }));
+        return data;
+    };
+    const query = useQuery({
+        queryKey: ["MenusByModuleIdZero", companyId],
+        queryFn: getData,
+        enabled: !!companyId && tableHasData, // API only calls when tableHasData = true
         staleTime: 1000 * 10,
     });
     return query;

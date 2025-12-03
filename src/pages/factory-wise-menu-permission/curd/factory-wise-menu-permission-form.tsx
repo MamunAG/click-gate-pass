@@ -9,7 +9,7 @@ import axios, { AxiosError } from 'axios';
 import { IApiResponseType } from '@/actions/api-response-type';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
-import { GetCompaniesByType, GetCompanyTypes } from '../factory-wise-menu-permission-service';
+import { GetCompaniesByType, GetCompanyTypes, GetMenusByModuleIdZero } from '../factory-wise-menu-permission-service';
 import AppAutoItemAddCombobox from '@/components/app-auto-item-add-combobox';
 import { z } from "zod";
 import { Form } from '@/components/ui/form';
@@ -47,6 +47,8 @@ type FactoryWiseMenuPermissionFormSchema = z.infer<typeof formSchema>;
 const formSchema = z.object({
     companyTypeId: z.number().optional(),
     companyId: z.number().optional(),
+    moduleId: z.number().optional(),
+    moduleName: z.string().optional(),
     details: z.array(FactoryWiseMenuPermissionFormDetailsSchema)
 })
 
@@ -62,6 +64,7 @@ export default function FactoryWiseMenuPermissionForm({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     // inside component
     const [rows, setRows] = useState<IFactoryRow[]>([])
+    const [tableHasData, setTableHasData] = useState(false);
     // Add button handler
     const handleAdd = () => {
         const selectedCompanyId = form.getValues("companyId")
@@ -90,6 +93,7 @@ export default function FactoryWiseMenuPermissionForm({
                 isActive: true,
             },
         ])
+        setTableHasData(true);
     }
 
 
@@ -159,11 +163,13 @@ export default function FactoryWiseMenuPermissionForm({
         })
     };
 
+
     const companyId = localStorage.getItem(localStorageKey.selectedCompany) ?? 1;
     const { data: companyTypes } = GetCompanyTypes(Number(companyId));
     const selectedCompanyTypeId = form.watch("companyTypeId");
     console.log(selectedCompanyTypeId)
     const { data: companies } = GetCompaniesByType(Number(selectedCompanyTypeId));
+    const { data: modules } = GetMenusByModuleIdZero(Number(selectedCompanyTypeId), tableHasData);
 
 
 
@@ -225,7 +231,17 @@ export default function FactoryWiseMenuPermissionForm({
 
 
                             <div>
-                                test
+                                <AppAutoItemAddCombobox
+                                    form={form}
+                                    text={"Module"}
+                                    textFieldName={"moduleName"}
+                                    valueFieldName={"moduleId"}
+                                    selectItems={modules}
+                                    selectItemsLabelFieldName="MODULE_NAME"
+                                    selectItemsValueFieldName="MODULE_ID"
+                                    align="horizontal"
+                                    labelCSS="w-32"
+                                />
                             </div>
                         </div>
                     </form>
