@@ -23,6 +23,7 @@ export interface ICompany {
     id: number;
     companyId: number;
     name: string;
+    companyTypeId: number;
 }
 
 

@@ -18,6 +18,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { localStorageKey } from '@/lib/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { companyId } from '@/utility/app-data';
+import FactoryPermissionTable, { IFactoryRow } from './factory-permission-table';
 
 
 const FactoryWiseMenuPermissionFormDetailsSchema = z.object({
@@ -37,11 +39,14 @@ const FactoryWiseMenuPermissionFormDetailsSchema = z.object({
 });
 
 
+
+
 type FactoryWiseMenuPermissionFormSchema = z.infer<typeof formSchema>;
 
 
 const formSchema = z.object({
     companyTypeId: z.number().optional(),
+    companyId: z.number().optional(),
     details: z.array(FactoryWiseMenuPermissionFormDetailsSchema)
 })
 
@@ -55,7 +60,37 @@ export default function FactoryWiseMenuPermissionForm({
     // console.log('FactoryWiseMenuPermissionType', FactoryWiseMenuPermissionType);
     const navigator = useNavigate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    // inside component
+    const [rows, setRows] = useState<IFactoryRow[]>([])
+    // Add button handler
+    const handleAdd = () => {
+        const selectedCompanyId = form.getValues("companyId")
+        const selectedCompanyTypeId = form.getValues("companyTypeId")
 
+        const company = companies?.find(c => c.id === selectedCompanyId)
+        const unitType = companyTypes?.find(c => c.companyTypeId === selectedCompanyTypeId)
+
+        if (!company || !unitType) return
+
+        // prevent duplicates
+        const exists = rows.some(r => r.companyId === company.id && r.companyTypeId === unitType.companyTypeId)
+        if (exists) {
+            toast("This factory is already added.")
+            return
+        }
+
+        // add new row
+        setRows([
+            ...rows,
+            {
+                companyId: company.id,
+                companyName: company.name,
+                companyTypeId: unitType.companyTypeId,
+                companyUnitType: unitType.companyTypeName,
+                isActive: true,
+            },
+        ])
+    }
 
 
 
@@ -130,47 +165,68 @@ export default function FactoryWiseMenuPermissionForm({
     console.log(selectedCompanyTypeId)
     const { data: companies } = GetCompaniesByType(Number(selectedCompanyTypeId));
 
+
+
     return (
-        <div className='grid grid-cols-2'>
+        <div className='grid grid-cols-1'>
             <AppPageContainer>
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
-                        <div className=''>
-                            <div className='flex gap-2'>
-                                <AppAutoItemAddCombobox
-                                    form={form}
-                                    text={"Factory Type"}
-                                    textFieldName={"companyUnitType"}
-                                    valueFieldName={"companyTypeId"}
-                                    selectItems={companyTypes}
-                                    selectItemsLabelFieldName="companyTypeName"
-                                    selectItemsValueFieldName="companyTypeId"
-                                    align="horizontal"
-                                    labelCSS="w-32"
-                                />
+                        <div className='grid grid-cols-2 gap-2'>
+                            <div className=''>
+                                <div className='flex gap-2'>
+                                    <AppAutoItemAddCombobox
+                                        form={form}
+                                        text={"Factory Type"}
+                                        textFieldName={"companyUnitType"}
+                                        valueFieldName={"companyTypeId"}
+                                        selectItems={companyTypes}
+                                        selectItemsLabelFieldName="companyTypeName"
+                                        selectItemsValueFieldName="companyTypeId"
+                                        align="horizontal"
+                                        labelCSS="w-32"
+                                    />
+                                    <div>
+                                        <Button><Plus /> Add All</Button>
+                                    </div>
+                                </div>
+
+                                <div className='flex gap-2'>
+                                    <AppAutoItemAddCombobox
+                                        form={form}
+                                        text={"Factory Name"}
+                                        textFieldName={"companyName"}
+                                        valueFieldName={"companyId"}
+                                        selectItems={companies}
+                                        selectItemsLabelFieldName="name"
+                                        selectItemsValueFieldName="id"
+                                        align="horizontal"
+                                        labelCSS="w-32"
+                                    />
+                                    <div>
+                                        <Button onClick={handleAdd}><Plus></Plus>Add</Button>
+                                    </div>
+                                </div>
+
                                 <div>
-                                    <Button><Plus></Plus>Add All</Button>
+                                    <FactoryPermissionTable rows={rows} setRows={setRows} />
+                                </div>
+
+
+
+
+                                <div className='mt-5'>
+                                    {/* Show live form values */}
+                                    <pre className="bg-gray-100 p-2 rounded text-sm">
+                                        {JSON.stringify(form.watch(), null, 2)}
+                                    </pre>
                                 </div>
                             </div>
 
-                            <div className='flex gap-2'>
-                                <AppAutoItemAddCombobox
-                                    form={form}
-                                    text={"Factory Name"}
-                                    textFieldName={"companyName"}
-                                    valueFieldName={"companyId"}
-                                    selectItems={companies}
-                                    selectItemsLabelFieldName="name"
-                                    selectItemsValueFieldName="id"
-                                    align="horizontal"
-                                    labelCSS="w-32"
-                                />
-                                <div>
-                                    <Button><Plus></Plus>Add</Button>
-                                </div>
+
+                            <div>
+                                test
                             </div>
-
-
                         </div>
                     </form>
                 </Form>
