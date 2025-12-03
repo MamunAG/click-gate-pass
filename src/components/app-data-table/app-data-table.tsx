@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import {
-  type ColumnDef,
   type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -29,7 +28,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ChevronDown, Search, X, type LucideIcon } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -56,76 +55,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
-// Import helper functions from separate file
 import {
   createSelectColumn,
   createActionsColumn,
   createDragColumn,
 } from "./table-helpers";
-
-import { useState } from "react";
 import { DraggableRow } from "./draggable-row";
+import { useState } from "react";
+import { AppDataTableProps } from "./types";
 
-//  TYPES
-export interface TableAction<TData = any> {
-  label: string;
-  onClick: (row: TData) => void | Promise<void>;
-  icon?: LucideIcon;
-  variant?: "default" | "destructive";
-  show?: (row: TData) => boolean;
-}
 
-export interface BulkAction<TData = any> {
-  label: string;
-  onClick: (selectedRows: TData[]) => void | Promise<void>;
-  icon?: LucideIcon;
-  variant?: "default" | "destructive";
-}
-
-export interface FilterConfig {
-  columnId: string;
-  placeholder?: string;
-  type?: "text" | "search";
-}
-
-export interface AppDataTableProps<TData = any> {
-  // Core Props
-  data: TData[];
-  columns: ColumnDef<TData>[];
-
-  // Table Features
-  enableSelection?: boolean;
-  enableSorting?: boolean;
-  enableGlobalFilter?: boolean;
-  enablePagination?: boolean;
-  enableColumnVisibility?: boolean;
-  enableDragAndDrop?: boolean;
-
-  // Actions
-  rowActions?: TableAction<TData>[];
-  bulkActions?: BulkAction<TData>[];
-
-  // Filtering
-  searchPlaceholder?: string;
-  columnFilters?: FilterConfig[];
-
-  // Pagination
-  pageSize?: number;
-  pageSizeOptions?: number[];
-  showPaginationInfo?: boolean;
-
-  // Styling
-  className?: string;
-  tableClassName?: string;
-
-  // Loading & Empty States
-  isLoading?: boolean;
-  loadingText?: string;
-  emptyText?: string;
-}
-
-// Main Component
 export function AppDataTable<TData>({
   data,
   columns: initialColumns,

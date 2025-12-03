@@ -1,9 +1,8 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { Eye, Edit, Trash2, Copy, Download } from "lucide-react"
-
-import { type TableAction, type BulkAction } from "@/components/app-data-table/app-data-table"
 import { createSortableColumn } from "@/components/app-data-table/table-helpers"
 import type { IGatePassIndex } from "./gate-pass.dto"
+import { BulkAction, TableAction } from "@/components/app-data-table/types"
 
 // Column Definitions
 export const gatePassColumns: ColumnDef<IGatePassIndex>[] = [
