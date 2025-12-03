@@ -3,20 +3,15 @@
 import * as React from "react"
 import {
     AudioWaveform,
-    BookOpen,
-    Bot,
     Command,
-    FactoryIcon,
     Frame,
     GalleryVerticalEnd,
     Map,
     PieChart,
-    Settings2,
-    SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
+// import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -27,6 +22,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { AppMenu } from "@/pages/app-menu"
 
 // This is sample data.
 const data = {
@@ -52,105 +48,7 @@ const data = {
             plan: "Gazipur",
         },
     ],
-    navMain: [
-        {
-            title: "Store",
-            url: "#",
-            icon: SquareTerminal,
-            // isActive: true,
-            items: [
-                {
-                    title: "Gate-pass",
-                    url: "/dashboard/gate-pass",
-                },
-                {
-                    title: "Starred",
-                    url: "#",
-                },
-                {
-                    title: "Settings",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Factory Wise Menu Permission",
-            url: "#",
-            icon: FactoryIcon,
-            // isActive: true,
-            items: [
-                {
-                    title: "Factory Wise Menu Permission",
-                    url: "/dashboard/factory-wise-menu-permission-index",
-                },
-            ],
-        },
-        {
-            title: "Models",
-            url: "#",
-            icon: Bot,
-            items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Documentation",
-            url: "#",
-            icon: BookOpen,
-            items: [
-                {
-                    title: "Introduction",
-                    url: "#",
-                },
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Tutorials",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Settings",
-            url: "#",
-            icon: Settings2,
-            items: [
-                {
-                    title: "General",
-                    url: "#",
-                },
-                {
-                    title: "Team",
-                    url: "#",
-                },
-                {
-                    title: "Billing",
-                    url: "#",
-                },
-                {
-                    title: "Limits",
-                    url: "#",
-                },
-            ],
-        },
-    ],
+    navMain: AppMenu,
     projects: [
         {
             name: "Design Engineering",
@@ -179,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 <ScrollArea className="h-full">
                     <NavMain items={data.navMain} />
-                    <NavProjects projects={data.projects} />
+                    {/* <NavProjects projects={data.projects} /> */}
                     <ScrollBar orientation="vertical" />
                 </ScrollArea>
             </SidebarContent>

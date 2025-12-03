@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { localStorageKey, useAuth } from "./auth-provider";
 import useApiUrl from "@/hooks/use-ApiUrl";
+import { localStorageKey, useAuth } from "./auth-provider";
 
 let isRefreshing = false; // To track if the token is being refreshed
 let failedQueue: any[] = []; // Queue for requests during token refresh
 
 const processQueue = (error: any, token = null) => {
-    failedQueue.forEach((prom: any) => {
+    failedQueue.forEach((prom) => {
         if (token) {
             prom.resolve(token);
         } else {
@@ -31,7 +31,7 @@ export default function useAxiosInstance() {
 
     axiosInstance.interceptors.request.use(
         (request) => {
-            const accessToken = auth?.accessToken;
+            const accessToken = auth?.token;
             if (accessToken) {
                 request.headers["Authorization"] = `Bearer ${accessToken}`;
             }
@@ -72,7 +72,7 @@ export default function useAxiosInstance() {
                     // console.log("Token", auth?.token);
                     // console.log("RefreshToken", refreshToken);
                     const authData = {
-                        Token: auth?.accessToken,
+                        Token: auth?.token,
                         RefreshToken: refreshToken,
                     };
 
@@ -104,7 +104,7 @@ export default function useAxiosInstance() {
                     console.error("Token refresh failed:", refreshError);
                     await auth?.removeAccessToken();
                     await auth?.removeRefreshToken();
-                    // window.location.href = "/sign-in";
+                    window.location.href = "/login";
                     return Promise.reject(refreshError);
                 } finally {
                     isRefreshing = false;

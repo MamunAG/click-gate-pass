@@ -1,9 +1,7 @@
-import * as React from "react"
+/* eslint-disable react-refresh/only-export-components */
 import { type ColumnDef, type ColumnFiltersState, type SortingState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, PenBoxIcon } from "lucide-react"
+import { ArrowUpDown, PenBoxIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 import { useState } from "react"
 
