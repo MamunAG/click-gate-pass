@@ -182,6 +182,11 @@ export function AppDataTable<TData>({
   const [globalFilter, setGlobalFilter] = useState("");
   const [tableData, setTableData] = useState(data);
 
+  // Sync tableData when data prop changes
+  React.useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
   // Drag & Drop Setup
   const sortableId = React.useId();
   const sensors = useSensors(
@@ -213,6 +218,7 @@ export function AppDataTable<TData>({
   const table = useReactTable({
     data: enableDragAndDrop ? tableData : data,
     columns,
+    getRowId: (row) => (row as any).id?.toString() || Math.random().toString(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -242,6 +248,7 @@ export function AppDataTable<TData>({
     if (!enableDragAndDrop) return [];
     return tableData?.map((item: any) => item.id) || [];
   }, [tableData, enableDragAndDrop]);
+
 
   // Drag Handler
   function handleDragEnd(event: DragEndEvent) {
