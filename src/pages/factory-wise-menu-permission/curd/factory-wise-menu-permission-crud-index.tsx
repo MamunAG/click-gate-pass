@@ -49,7 +49,7 @@ export default function FactoryWiseMenuPermissionCRUD() {
         return (
             <>
                 <div className="flex flex-col gap-10">
-                    <FactoryWiseMenuPermissionForm pageAction={PageAction.view} />
+                    <FactoryWiseMenuPermissionForm pageAction={PageAction.add} />
                 </div>
             </>
 
