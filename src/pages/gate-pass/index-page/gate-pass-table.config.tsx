@@ -1,5 +1,5 @@
 import { type ColumnDef } from "@tanstack/react-table"
-import { Eye, Edit, Trash2, Copy, Download } from "lucide-react"
+import { Eye, Edit, Trash2, Copy, Download, FileText } from "lucide-react"
 import { createSortableColumn } from "@/components/app-data-table/table-helpers"
 import type { IGatePassIndex } from "./gate-pass.dto"
 import { BulkAction, TableAction } from "@/components/app-data-table/types"
@@ -86,7 +86,7 @@ export const gatePassActions: TableAction<IGatePassIndex>[] = [
 // Bulk Actions
 export const gatePassBulkActions: BulkAction<IGatePassIndex>[] = [
   {
-    label: "Export Selected",
+    label: "Export to CSV",
     icon: Download,
     onClick: (selectedRows) => {
       // CSV Header
@@ -116,7 +116,71 @@ export const gatePassBulkActions: BulkAction<IGatePassIndex>[] = [
       
       // Cleanup
       URL.revokeObjectURL(url)
-      console.log(`Exported ${selectedRows.length} gate passes`)
+      console.log(`Exported ${selectedRows.length} gate passes to CSV`)
+    },
+  },
+  {
+    label: "Generate PDF",
+    icon: FileText,
+    onClick: (selectedRows) => {
+      // Create HTML table for PDF content
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              h1 { text-align: center; color: #333; }
+              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+              th { background-color: #4CAF50; color: white; padding: 12px; text-align: left; border: 1px solid #ddd; }
+              td { padding: 10px; border: 1px solid #ddd; }
+              tr:nth-child(even) { background-color: #f9f9f9; }
+              tr:hover { background-color: #f5f5f5; }
+              .meta { margin-bottom: 10px; color: #666; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            <h1>Gate Pass Report</h1>
+            <div class="meta">
+              <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+              <p><strong>Total Records:</strong> ${selectedRows.length}</p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Created By</th>
+                  <th>Ref No</th>
+                  <th>Type</th>
+                  <th>Org Supplier</th>
+                  <th>Status</th>
+                  <th>Approved By</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${selectedRows.map(row => `
+                  <tr>
+                    <td>${row.date}</td>
+                    <td>${row.createdBy}</td>
+                    <td>${row.refNo}</td>
+                    <td>${row.type}</td>
+                    <td>${row.orgSupplier}</td>
+                    <td>${row.status}</td>
+                    <td>${row.aprvBy}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `
+      // Open print dialog (browser's built-in PDF generation)
+      const printWindow = window.open("", "", "height=600,width=800")
+      if (printWindow) {
+        printWindow.document.write(htmlContent)
+        printWindow.document.close()
+        printWindow.print()
+        console.log(`Generated PDF for ${selectedRows.length} gate passes`)
+      }
     },
   },
 ]
