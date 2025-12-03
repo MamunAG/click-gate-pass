@@ -15,6 +15,8 @@ export interface AppDataTableProps<TData = any> {
   enablePagination?: boolean;
   enableColumnVisibility?: boolean;
   enableDragAndDrop?: boolean;
+  enablePinning?: boolean;
+  pinnedColumnsCount?: number;
 
   // Actions
   rowActions?: TableAction<TData>[];

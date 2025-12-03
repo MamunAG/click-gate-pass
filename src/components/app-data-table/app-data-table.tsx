@@ -2,6 +2,7 @@
 import * as React from "react";
 import {
   type ColumnFiltersState,
+  type ColumnPinningState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -63,7 +64,7 @@ import {
 import { DraggableRow } from "./draggable-row";
 import { useState } from "react";
 import { AppDataTableProps } from "./types";
-import { GetCommonPinningStyles } from "./pinned-column";
+import { usePinningStyles } from "./pinned-column";
 
 export function AppDataTable<TData>({
   data,
@@ -74,6 +75,8 @@ export function AppDataTable<TData>({
   enablePagination = true,
   enableColumnVisibility = true,
   enableDragAndDrop = false,
+  enablePinning = false,
+  pinnedColumnsCount = 3,
   rowActions,
   bulkActions,
   searchPlaceholder = "Search...",
@@ -87,11 +90,13 @@ export function AppDataTable<TData>({
   emptyText = "No data available.",
 }: AppDataTableProps<TData>) {
   //  State setup
+  const { getCommonPinningStyles } = usePinningStyles();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({});
   const [tableData, setTableData] = useState(data);
 
   // Sync tableData when data prop changes
@@ -126,6 +131,28 @@ export function AppDataTable<TData>({
     return cols;
   }, [initialColumns, enableSelection, enableDragAndDrop, rowActions]);
 
+  // Auto-pin columns when enablePinning is true
+  React.useEffect(() => {
+    if (enablePinning && columns.length > 0) {
+      const columnIds = columns.slice(0, pinnedColumnsCount).map((col, index) => {
+        // Get the column id properly
+        if (typeof col.id === 'string') {
+          return col.id;
+        } else if ('accessorKey' in col && col.accessorKey) {
+          return String(col.accessorKey);
+        } else {
+          return `column-${index}`;
+        }
+      });
+      
+      setColumnPinning({
+        left: columnIds,
+      });
+    } else {
+      setColumnPinning({});
+    }
+  }, [enablePinning, pinnedColumnsCount, columns]);
+
   // Table Instance
   const table = useReactTable({
     data: enableDragAndDrop ? tableData : data,
@@ -142,12 +169,15 @@ export function AppDataTable<TData>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
+    onColumnPinningChange: setColumnPinning,
+    enableColumnPinning: enablePinning,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
       globalFilter,
+      columnPinning,
     },
     initialState: {
       pagination: {
@@ -276,7 +306,7 @@ export function AppDataTable<TData>({
                         <TableHead
                           key={header.id}
                           colSpan={header.colSpan}
-                          style={{ ...GetCommonPinningStyles(column) }}
+                          style={{ ...getCommonPinningStyles(column) }}
                         >
                           {header.isPlaceholder
                             ? null
@@ -284,41 +314,6 @@ export function AppDataTable<TData>({
                                 header.column.columnDef.header,
                                 header.getContext()
                               )}
-                          {!header.isPlaceholder &&
-                            header.column.getCanPin() && (
-                              <div className="flex gap-1 justify-center">
-                                {header.column.getIsPinned() !== "left" ? (
-                                  <button
-                                    className="border rounded px-2"
-                                    onClick={() => {
-                                      header.column.pin("left");
-                                    }}
-                                  >
-                                    {"<="}
-                                  </button>
-                                ) : null}
-                                {header.column.getIsPinned() ? (
-                                  <button
-                                    className="border rounded px-2"
-                                    onClick={() => {
-                                      header.column.pin(false);
-                                    }}
-                                  >
-                                    X
-                                  </button>
-                                ) : null}
-                                {header.column.getIsPinned() !== "right" ? (
-                                  <button
-                                    className="border rounded px-2"
-                                    onClick={() => {
-                                      header.column.pin("right");
-                                    }}
-                                  >
-                                    {"=>"}
-                                  </button>
-                                ) : null}
-                              </div>
-                            )}
                         </TableHead>
                       );
                     })}
@@ -389,7 +384,7 @@ export function AppDataTable<TData>({
                       return (
                         <TableCell 
                           key={cell.id}
-                          style={{ ...GetCommonPinningStyles(column) }}
+                          style={{ ...getCommonPinningStyles(column) }}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
