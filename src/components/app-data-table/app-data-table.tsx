@@ -65,6 +65,7 @@ import {
   createActionsColumn,
   createDragColumn,
 } from "./table-helpers";
+import { useState } from "react";
 
 //  TYPES
 export interface TableAction<TData = any> {
@@ -173,18 +174,15 @@ export function AppDataTable<TData>({
   loadingText = "Loading...",
   emptyText = "No data available.",
 }: AppDataTableProps<TData>) {
-  // ========== STATE ==========
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [globalFilter, setGlobalFilter] = React.useState("");
-  const [tableData, setTableData] = React.useState(data);
+  //  State setup
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [tableData, setTableData] = useState(data);
 
-  // ========== DRAG AND DROP SETUP ==========
+  // Drag & Drop Setup
   const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -192,16 +190,7 @@ export function AppDataTable<TData>({
     useSensor(KeyboardSensor, {})
   );
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(() => {
-    if (!enableDragAndDrop) return [];
-    return tableData?.map((item: any) => item.id) || [];
-  }, [tableData, enableDragAndDrop]);
-
-  // Update table data when external data changes
-  React.useEffect(() => {
-    setTableData(data);
-  }, [data]);
-
+  // Columns Setup
   const columns = React.useMemo(() => {
     const cols = [...initialColumns];
 
@@ -220,19 +209,7 @@ export function AppDataTable<TData>({
     return cols;
   }, [initialColumns, enableSelection, enableDragAndDrop, rowActions]);
 
-  // ========== DRAG HANDLER ==========
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      setTableData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
-        return arrayMove(data, oldIndex, newIndex);
-      });
-    }
-  }
-
-  // ========== TABLE INSTANCE ==========
+  // Table Instance
   const table = useReactTable({
     data: enableDragAndDrop ? tableData : data,
     columns,
@@ -261,8 +238,24 @@ export function AppDataTable<TData>({
     },
   });
 
+  const dataIds = React.useMemo<UniqueIdentifier[]>(() => {
+    if (!enableDragAndDrop) return [];
+    return tableData?.map((item: any) => item.id) || [];
+  }, [tableData, enableDragAndDrop]);
 
-  // ========== COMPUTED VALUES ==========
+  // Drag Handler
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      setTableData((data) => {
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
+    }
+  }
+
+  // Computed Values
   const selectedRows = table
     .getFilteredSelectedRowModel()
     .rows.map((row) => row.original);
@@ -270,7 +263,7 @@ export function AppDataTable<TData>({
 
   return (
     <div className={cn("w-full space-y-4", className)}>
-      {/* ========== TOOLBAR ========== */}
+      {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
           {/* Global Search */}
@@ -345,7 +338,7 @@ export function AppDataTable<TData>({
         )}
       </div>
 
-      {/* ========== TABLE ========== */}
+      {/* Table */}
       <div className="rounded-md border">
         {enableDragAndDrop ? (
           <DndContext
@@ -398,88 +391,6 @@ export function AppDataTable<TData>({
             </Table>
           </DndContext>
         ) : (
-          // <DndContext
-          //   collisionDetection={closestCenter}
-          //   modifiers={[restrictToVerticalAxis]}
-          //   onDragEnd={handleDragEnd}
-          //   sensors={sensors}
-          //   id={sortableId}
-          // >
-          //   <Table className={tableClassName}>
-          //     <TableHeader>
-          //       {table.getHeaderGroups().map((headerGroup) => (
-          //         <TableRow key={headerGroup.id}>
-          //           {headerGroup.headers.map((header) => (
-          //             <TableHead key={header.id}>
-          //               {header.isPlaceholder
-          //                 ? null
-          //                 : flexRender(
-          //                     header.column.columnDef.header,
-          //                     header.getContext()
-          //                   )}
-          //             </TableHead>
-          //           ))}
-          //         </TableRow>
-          //       ))}
-          //     </TableHeader>
-
-          //     <TableBody>
-          //       {isLoading ? (
-          //         <TableRow>
-          //           <TableCell
-          //             colSpan={columns.length}
-          //             className="h-24 text-center"
-          //           >
-          //             {loadingText}
-          //           </TableCell>
-          //         </TableRow>
-          //       ) : table.getRowModel().rows?.length ? (
-          //         enableDragAndDrop ? (
-          //           <SortableContext
-          //             items={dataIds}
-          //             strategy={verticalListSortingStrategy}
-          //           >
-          //             {table.getRowModel().rows.map((row) => (
-          //               <DraggableRow
-          //                 key={row.id}
-          //                 row={row}
-          //               />
-          //             ))}
-          //           </SortableContext>
-          //         ) : (
-          //           table.getRowModel().rows.map((row) => (
-          //             <TableRow
-          //               key={row.id}
-          //               data-state={row.getIsSelected() && "selected"}
-          //               className={cn(
-          //                 onRowClick && "cursor-pointer hover:bg-muted/50"
-          //               )}
-          //               onClick={() => onRowClick?.(row.original)}
-          //             >
-          //               {row.getVisibleCells().map((cell) => (
-          //                 <TableCell key={cell.id}>
-          //                   {flexRender(
-          //                     cell.column.columnDef.cell,
-          //                     cell.getContext()
-          //                   )}
-          //                 </TableCell>
-          //               ))}
-          //             </TableRow>
-          //           ))
-          //         )
-          //       ) : (
-          //         <TableRow>
-          //           <TableCell
-          //             colSpan={columns.length}
-          //             className="h-24 text-center"
-          //           >
-          //             {emptyText}
-          //           </TableCell>
-          //         </TableRow>
-          //       )}
-          //     </TableBody>
-          //   </Table>
-          // </DndContext>
           <Table className={tableClassName}>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -513,9 +424,7 @@ export function AppDataTable<TData>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                     "cursor-pointer hover:bg-muted/50"
-                    )}
+                    className={cn("cursor-pointer hover:bg-muted/50")}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -542,7 +451,7 @@ export function AppDataTable<TData>({
         )}
       </div>
 
-      {/* ========== PAGINATION ========== */}
+      {/* Pagination */}
       {enablePagination && (
         <div className="flex items-center justify-between px-2">
           {/* Selection Info */}

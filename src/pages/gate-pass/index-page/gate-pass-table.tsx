@@ -6,7 +6,6 @@ import {
   gatePassBulkActions,
 } from "./gate-pass-table.config";
 
-// ================== MAIN COMPONENT ==================
 export function GatePassTable({ data }: { data: IGatePassIndex[] }) {
   return (
     <AppDataTable

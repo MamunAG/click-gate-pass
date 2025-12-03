@@ -18,7 +18,7 @@ import {
 import type { TableAction } from "./app-data-table"
 import { DragHandle } from "./drag-handle"
 
-// ================== COLUMN HELPER FUNCTIONS ==================
+// Column Creators
 
 export function createDragColumn<TData = any>(): ColumnDef<TData> {
   return {

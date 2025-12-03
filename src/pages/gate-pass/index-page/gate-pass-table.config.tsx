@@ -5,7 +5,7 @@ import { type TableAction, type BulkAction } from "@/components/app-data-table/a
 import { createSortableColumn } from "@/components/app-data-table/table-helpers"
 import type { IGatePassIndex } from "./gate-pass.dto"
 
-// ================== COLUMN DEFINITIONS ==================
+// Column Definitions
 export const gatePassColumns: ColumnDef<IGatePassIndex>[] = [
   {
     accessorKey: "date",
@@ -40,7 +40,7 @@ export const gatePassColumns: ColumnDef<IGatePassIndex>[] = [
   },
 ]
 
-// ================== ACTION DEFINITIONS ==================
+// Action Definitions
 export const gatePassActions: TableAction<IGatePassIndex>[] = [
   {
     label: "Copy Ref Number",
@@ -84,7 +84,7 @@ export const gatePassActions: TableAction<IGatePassIndex>[] = [
   },
 ]
 
-// ================== BULK ACTIONS ==================
+// Bulk Actions
 export const gatePassBulkActions: BulkAction<IGatePassIndex>[] = [
   {
     label: "Export Selected",
@@ -103,22 +103,6 @@ export const gatePassBulkActions: BulkAction<IGatePassIndex>[] = [
       a.click()
       
       console.log(`Exported ${selectedRows.length} gate passes`)
-    },
-  },
-  {
-    label: "Delete Selected",
-    icon: Trash2,
-    variant: "destructive",
-    onClick: async (selectedRows) => {
-      const count = selectedRows.length
-      if (confirm(`Are you sure you want to delete ${count} gate passes?`)) {
-        try {
-          // Bulk delete logic
-          console.log(`Deleting ${count} gate passes:`, selectedRows.map(r => r.id))
-        } catch (error) {
-          console.error("Failed to delete gate passes:", error)
-        }
-      }
     },
   },
 ]
