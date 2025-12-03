@@ -57,15 +57,19 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
 export function createSortableColumn<TData>(
   accessor: keyof TData,
   header: string,
-  cellRenderer?: (value: any) => React.ReactNode
+  options?: {
+    cellRenderer?: (value: any) => React.ReactNode;
+    headerVariant?: "ghost" | "default" | "destructive" | "outline" | "secondary";
+    headerClassName?: string;
+  }
 ): ColumnDef<TData> {
   return {
     accessorKey: accessor as string,
     header: ({ column }) => (
       <Button
-        variant="ghost"
+        variant={options?.headerVariant || "ghost"}
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="h-auto p-0 font-semibold hover:bg-transparent"
+        className={options?.headerClassName || "h-auto p-0 font-semibold hover:bg-transparent"}
       >
         {header}
         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -73,7 +77,9 @@ export function createSortableColumn<TData>(
     ),
     cell: ({ row }) => {
       const value = row.getValue(accessor as string)
-      return cellRenderer ? cellRenderer(value) : <div>{String(value ?? '')}</div>
+      return options?.cellRenderer 
+        ? options.cellRenderer(value) 
+        : <div>{String(value ?? '')}</div>
     },
   }
 }
