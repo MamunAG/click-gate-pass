@@ -63,7 +63,18 @@ import {
 import { DraggableRow } from "./draggable-row";
 import { useState } from "react";
 import { AppDataTableProps } from "./types";
+import { getCommonPinningStyles } from "./pinned-column";
 
+// const getCommonPinningStyles = (column: Column<any>): React.CSSProperties => {
+//   const isPinned = column.getIsPinned();
+//   return {
+//     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
+//     opacity: isPinned ? 1 : 1,
+//     position: isPinned ? "sticky" : "relative",
+//     width: column.getSize(),
+//     zIndex: isPinned ? 1 : 0,
+//   };
+// };
 
 export function AppDataTable<TData>({
   data,
@@ -160,7 +171,6 @@ export function AppDataTable<TData>({
     if (!enableDragAndDrop) return [];
     return tableData?.map((item: any) => item.id) || [];
   }, [tableData, enableDragAndDrop]);
-
 
   // Drag Handler
   function handleDragEnd(event: DragEndEvent) {
@@ -272,8 +282,13 @@ export function AppDataTable<TData>({
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
+                      const { column } = header;
                       return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          style={{ ...getCommonPinningStyles(column) }}
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -410,10 +425,11 @@ export function AppDataTable<TData>({
 
             {/* Page Info */}
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {table.getPageCount() === 0 
-                ? "No pages" 
-                : `Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`
-              }
+              {table.getPageCount() === 0
+                ? "No pages"
+                : `Page ${
+                    table.getState().pagination.pageIndex + 1
+                  } of ${table.getPageCount()}`}
             </div>
 
             {/* Navigation Buttons */}
