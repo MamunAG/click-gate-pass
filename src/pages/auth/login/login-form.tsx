@@ -34,8 +34,6 @@ export function LoginForm({
     const handleSubmitEvent = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (input.username !== "" && input.password !== "") {
-            alert(auth);
-
             await auth?.loginAction(input);
             return;
         }

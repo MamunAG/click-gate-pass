@@ -14,7 +14,7 @@ export default function GatePassCRUD() {
     const setPageTitle = useAppStore((state) => state.setPageName);
     React.useEffect(() => { setPageTitle('Gate-pass') }, [setPageTitle])
     const axios = useAxiosInstance();
-    const [voucher, setVoucher] = React.useState<IGatePassSaveDto | undefined>();
+    const [gatePass, setGatePass] = React.useState<IGatePassSaveDto | undefined>();
     const [isLoading, setIsLoading] = React.useState(false);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
@@ -30,9 +30,9 @@ export default function GatePassCRUD() {
                         if (res.IsError) {
                             console.log("Error found: ", res.Errors);
                             setErrorMsg(JSON.stringify(res.Errors));
-                            setVoucher(undefined);
+                            setGatePass(undefined);
                         } else {
-                            setVoucher(res.Data);
+                            setGatePass(res.Data);
                         }
                     })
                     .catch((m) => console.log(m));
@@ -41,7 +41,9 @@ export default function GatePassCRUD() {
                 setIsLoading(false);
             }
         }
-        getData();
+        if (id && Number(id) > 0) {
+            getData();
+        }
 
     }, []);
 
@@ -78,7 +80,7 @@ export default function GatePassCRUD() {
         return (
             <>
                 <div className="flex flex-col gap-10">
-                    <GatePassForm data={voucher} pageAction={PageAction.view} />
+                    <GatePassForm data={gatePass} pageAction={PageAction.view} />
                 </div>
             </>
 
@@ -87,7 +89,7 @@ export default function GatePassCRUD() {
         return (
             <>
                 <div className="flex flex-col gap-10">
-                    <GatePassForm data={voucher} pageAction={PageAction.add} />
+                    <GatePassForm data={gatePass} pageAction={PageAction.add} />
                 </div>
             </>
         );
@@ -95,7 +97,7 @@ export default function GatePassCRUD() {
         return (
             <>
                 <div className="flex flex-col gap-10">
-                    <GatePassForm data={voucher} pageAction={PageAction.edit} />
+                    <GatePassForm data={gatePass} pageAction={PageAction.edit} />
                 </div>
             </>
 
@@ -105,7 +107,7 @@ export default function GatePassCRUD() {
         return (
             <>
                 <div className="flex flex-col gap-10">
-                    <GatePassForm data={voucher} pageAction={PageAction.delete} />
+                    <GatePassForm data={gatePass} pageAction={PageAction.delete} />
                 </div>
             </>
         );

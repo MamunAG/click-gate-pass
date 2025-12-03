@@ -1,6 +1,7 @@
 import { ModuleIcons } from "@/components/module-icon";
+import { INavMenu } from "@/components/nav-main";
 
-export const MerchandiserMenu =
+export const MerchandiserMenu: INavMenu =
 {
     title: "Merchandising",
     url: "#",

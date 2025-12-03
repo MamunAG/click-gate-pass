@@ -22,9 +22,10 @@ import { Link } from "react-router-dom"
 export type INavMenu = {
     title: string
     menuName?: string
-    url: string
+    url?: string
     icon?: LucideIcon
     isActive?: boolean
+    element?: React.ReactNode
     items?: INavMenu[]
 }
 
@@ -84,7 +85,7 @@ function NavBarMenuSubItem(props: INavMenu) {
 
         <SidebarMenuSubItem key={props.title}>
             <SidebarMenuSubButton asChild>
-                <Link to={props.url}>
+                <Link to={props.url ?? '#'}>
                     <span>{props.title}</span>
                 </Link>
             </SidebarMenuSubButton>
@@ -116,7 +117,7 @@ function NavBarCollapsibleMenu(props: INavMenu) {
                                     (<NavBarCollapsibleMenu {...subItem} />) :
                                     (<SidebarMenuSubItem key={subItem.title}>
                                         <SidebarMenuSubButton asChild>
-                                            <Link to={subItem.url}>
+                                            <Link to={subItem.url ?? '#'}>
                                                 <span>{subItem.title}</span>
                                             </Link>
                                         </SidebarMenuSubButton>

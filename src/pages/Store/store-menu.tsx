@@ -1,16 +1,23 @@
 import { ModuleIcons } from "@/components/module-icon";
+import { INavMenu } from "@/components/nav-main";
+import GatePassIndex from "../gate-pass/gate-pass-index";
+import GatePassCRUD from "../gate-pass/crud/gate-pass-crud-index";
 
-export const StoreMenu =
+export const StoreMenu: INavMenu =
 {
     title: "Inventory",
     url: "#",
     icon: ModuleIcons.Inventory,
-    // isActive: true,
     items: [
         {
             title: "Gate-pass",
-            url: "/dashboard/gate-pass",
-            items: []
+            url: "inventory/gate-pass",
+            element: <GatePassIndex />,
+        },
+        {
+            title: "Gate-pass",
+            url: "inventory/gate-pass/:pageAction/:id",
+            element: <GatePassCRUD />,
         },
         {
             title: "Inventory Config",
@@ -18,7 +25,7 @@ export const StoreMenu =
             items: [
                 {
                     title: "Rack Setup",
-                    url: "/dashboard/gate-pass",
+                    url: "inventory/gate-pass",
                 },
                 {
                     title: "Store Setup",
@@ -48,7 +55,7 @@ export const StoreMenu =
                 },
                 {
                     title: "General Material Transfer",
-                    url: "/dashboard/gate-pass",
+                    url: "inventory/gate-pass",
                 }
             ]
         },

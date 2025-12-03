@@ -30,7 +30,6 @@ import AppAutoItemAddCombobox from "@/components/app-auto-item-add-combobox";
 import AppDate from "@/components/app-date";
 import AppFormAction from "@/components/app-form-action";
 import { PlusCircle, Trash2 } from "lucide-react";
-import useApiUrl from "@/hooks/use-ApiUrl";
 import { useMutation } from "@tanstack/react-query";
 import type { IGatePassSaveDto } from "../dto/gate-pass-save.dto";
 import { Delete, GetAllBuyer, GetAllMaterialWithPagination, GetAllPoByStyle, GetAllStyleByBuyer, Save, Update } from "../gate-pass.service";
@@ -43,6 +42,7 @@ import AppFormCombobox from "@/components/app-form-combobox";
 import { AppSheet } from "@/components/AppSheet";
 import TaxForm from "@/pages/Tax/Tax-form";
 import { SelectItemType } from "@/types/selectItemType";
+import { usePathUrl } from "@/hooks/usePathUrl";
 
 const GatepassDetailsSchema = z.object({
     Id: z.number(),
@@ -108,26 +108,14 @@ export default function GatePassForm({
     data: IGatePassSaveDto | undefined;
     pageAction: string;
 }) {
-
-    // const [width, setWidth] = React.useState(window.innerWidth);
-    // React.useEffect(() => {
-    //     const handleResize = () => setWidth(window.innerWidth);
-
-    //     window.addEventListener("resize", handleResize);
-    //     return () => window.removeEventListener("resize", handleResize);
-    // }, []);
+    const path = usePathUrl();
 
     const { GatepassType } = useParams();
-    console.log('GatepassType', GatepassType);
 
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
+    console.log(setIsLoading)
     const navigator = useNavigate();
     const axios = useAxiosInstance();
-    const api = useApiUrl();
-    console.log(api)
-    console.log(setIsLoading)
-
 
     const itemTypesData = GetAllItemTypes();
     const { data: gmtTypesData } = GetAllGmtTypes();
@@ -138,15 +126,8 @@ export default function GatePassForm({
     const { data: uomData } = GetAllUom();
     const { data: buyerData } = GetAllBuyer();
 
-    // const { data: itemData } = GetAllMaterial();
-
-
     const [stylesByBuyerData, setStylesByBuyerData] = React.useState<Record<string, SelectItemType[]>>({});
     const [poByStyleData, setPoByStyleData] = React.useState<Record<string, SelectItemType[]>>({});
-
-
-
-    // useEffect(() => GetAllMaterialWithPagination(), [])
 
     const mutation = useMutation({
         mutationFn: (tag: IGatePassSaveDto) => {
@@ -161,18 +142,10 @@ export default function GatePassForm({
             }
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({
-            //     queryKey: [ReactQueryKey.AccountGatepass],
-            // });
             navigator(`/Gatepass/${GatepassType}`);
         },
         onError: (err: AxiosError) => {
-            console.log('error', err.response?.data);
             const res = err.response?.data as IApiResponseType<IGatePassSaveDto>;
-            // if (res?.IsError) {
-            //     setErrors(res?.Errors);
-            // }
-
             toast.error("Message", {
                 position: "top-center",
                 description: (
@@ -212,7 +185,6 @@ export default function GatePassForm({
     });
 
     function onSubmit(values: GatepassFormSchema) {
-        console.log('submit', values);
         alert(JSON.stringify(values));
         // mutation.mutate(values);
     }
@@ -283,11 +255,12 @@ export default function GatePassForm({
             uom: ''
         })
     };
+
     return (
         <AppPageContainer>
             <Form {...form}>
                 <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
-                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={`/dashboard/gate-pass`}>
+                    <AppFormAction pageAction={pageAction} mutationIsPending={mutation.isPending} isLoading={isLoading} navigationLink={path}>
                         <AppSheet
                             title="New UOM"
                             btnText='UOM'

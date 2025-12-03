@@ -1,34 +1,25 @@
 /* eslint-disable react-refresh/only-export-components */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import useApiUrl from "@/hooks/use-ApiUrl";
 import axios, { AxiosError } from "axios";
 import React, { useContext, createContext, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-// import useApiUrl from "src/hooks/use-ApiUrl";
+import { useNavigate } from "react-router";
+import useApiUrl from "@/hooks/use-ApiUrl";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const localStorageKey = {
-  accessTokenKey: "next_sol_access_token",
-  refreshTokenKey: "next_sol_refresh_token",
-  tokenSaveTimeKey: "next_sol_access_token_save_time",
-  selectedCompany: "next_sol_selectedCompany"
+  accessTokenKey: "click_api_token",
+  refreshTokenKey: "click_api_refresh_token",
 };
 
 export interface AuthContextType {
-  accessToken: string | null;
-  refreshToken: string | null;
-  tokenSavedTime: Date | null;
+  token: string | null;
   user: string | null;
   message: string | null;
   isLoading: boolean;
-  selectedCompany: string | null;
   loginAction: (data: { username: string; password: string }) => Promise<void>;
   logOut: () => void;
   setNewAccessToken: (token: string) => void;
   setNewRefreshToken: (token: string) => void;
   removeAccessToken: () => void;
   removeRefreshToken: () => void;
-  setSelectedCompany: (companyId: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,67 +29,47 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirect-to");
-  // console.log("rutl: ", redirectTo);
   const [isLoading, setIsLoading] = React.useState(false);
   const [user, setUser] = useState<string | null>(
     localStorage.getItem("user") || ""
   );
   const [message, setMessage] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(
+  const [token, setToken] = useState<string | null>(
     localStorage.getItem(localStorageKey.accessTokenKey) || ""
   );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
+  const [, setRefreshToken] = useState<string | null>(
     localStorage.getItem(localStorageKey.refreshTokenKey) || ""
   );
-  const [tokenSavedTime, setTokenSavedTime] = useState<Date | null>(
-    new Date(localStorage.getItem(localStorageKey.tokenSaveTimeKey) || "")
-  );
-
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(
-    localStorage.getItem(localStorageKey.selectedCompany) || ""
-  );
-
   const navigate = useNavigate();
   const api = useApiUrl();
 
   const loginAction = async (data: { username: string; password: string }) => {
-    console.log(data)
-
     try {
       setIsLoading(true);
       setMessage(null);
-      setSelectedCompany("");
 
       const authData = {
         Email: data.username,
         Password: data.password,
       };
-      console.log(authData)
+
       const response = await axios.post(
-        `${api.ProductionRootUrl}/api/account/login`,
+        `${api.ProductionRootUrl}/api/production/account/login`,
         authData
       );
 
       if (response.data) {
         setUser(data.username);
-        setAccessToken(response.data.AccessToken);
+        setToken(response.data.Token);
         setRefreshToken(response.data.RefreshToken);
-        setTokenSavedTime(new Date());
 
         await localStorage.setItem("user", data.username);
-        setNewAccessToken(response.data.AccessToken);
+        setNewAccessToken(response.data.Token);
         setNewRefreshToken(response.data.RefreshToken);
 
         // console.log(response.data);
-        if (redirectTo) {
-          navigate(`/${redirectTo}`);
-          window.location.reload();
-        } else {
-          navigate("/");
-          window.location.reload();
-        }
+
+        navigate("/dashboard");
         setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -129,28 +100,21 @@ export default function AuthProvider({
   const removeRefreshToken = () =>
     localStorage.removeItem(localStorageKey.refreshTokenKey);
 
-  const setSelectedCompanyInLocalStorage = (companyId: string) =>
-    localStorage.setItem(localStorageKey.selectedCompany, companyId);
-
   const logOut = () => {
     setIsLoading(true);
     setUser(null);
-    setAccessToken(null);
+    setToken(null);
     setRefreshToken(null);
     removeAccessToken();
     removeRefreshToken();
-    navigate("/sign-in");
+    navigate("/login");
     setIsLoading(false);
-    setSelectedCompany("");
-    localStorage.removeItem(localStorageKey.selectedCompany);
   };
 
   return (
     <AuthContext.Provider
       value={{
-        accessToken,
-        refreshToken,
-        tokenSavedTime,
+        token,
         user,
         loginAction,
         logOut,
@@ -160,8 +124,6 @@ export default function AuthProvider({
         setNewRefreshToken,
         removeAccessToken,
         removeRefreshToken,
-        selectedCompany,
-        setSelectedCompany: setSelectedCompanyInLocalStorage
       }}
     >
       {children}
