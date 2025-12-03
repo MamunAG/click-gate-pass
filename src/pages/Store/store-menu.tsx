@@ -13,11 +13,13 @@ export const StoreMenu: INavMenu =
             title: "Gate-pass",
             url: "inventory/gate-pass",
             element: <GatePassIndex />,
+            isMeuItem: true,
         },
         {
-            title: "Gate-pass",
+            title: "Gate-pass Crud",
             url: "inventory/gate-pass/:pageAction/:id",
             element: <GatePassCRUD />,
+            isMeuItem: false,
         },
         {
             title: "Inventory Config",
@@ -26,38 +28,57 @@ export const StoreMenu: INavMenu =
                 {
                     title: "Rack Setup",
                     url: "inventory/gate-pass",
+                    isMeuItem: true,
                 },
                 {
                     title: "Store Setup",
                     url: "#",
+                    isMeuItem: true,
                 }]
-        },
-        {
-            title: "Store",
-            url: "#",
-            items: [
-                {
-                    title: "Inventory Requ.",
-                    items: [
-                        {
-                            title: "Internal Requisition",
-                            url: "#",
-                        },
-                        {
-                            title: "Requisition Approval",
-                            url: "#",
-                        },
-                        {
-                            title: "General Material Issue",
-                            url: "#",
-                        },
-                    ]
-                },
-                {
-                    title: "General Material Transfer",
-                    url: "inventory/gate-pass",
-                }
-            ]
         },
     ],
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// {
+//     title: "Store",
+//     url: "#",
+//     items: [
+//         {
+//             title: "Inventory Requ.",
+//             items: [
+//                 {
+//                     title: "Internal Requisition",
+//                     url: "#",
+//                 },
+//                 {
+//                     title: "Requisition Approval",
+//                     url: "#",
+//                 },
+//                 {
+//                     title: "General Material Issue",
+//                     url: "#",
+//                 },
+//             ]
+//         },
+//         {
+//             title: "General Material Transfer",
+//             url: "inventory/gate-pass",
+//         }
+//     ]
+// },

@@ -25,6 +25,7 @@ export type INavMenu = {
     url?: string
     icon?: LucideIcon
     isActive?: boolean
+    isMeuItem?: boolean
     element?: React.ReactNode
     items?: INavMenu[]
 }
@@ -81,16 +82,17 @@ export function NavMain({
 }
 
 function NavBarMenuSubItem(props: INavMenu) {
-    return (
+    if (props.isMeuItem)
+        return (
 
-        <SidebarMenuSubItem key={props.title}>
-            <SidebarMenuSubButton asChild>
-                <Link to={props.url ?? '#'}>
-                    <span>{props.title}</span>
-                </Link>
-            </SidebarMenuSubButton>
-        </SidebarMenuSubItem>
-    )
+            <SidebarMenuSubItem key={props.title}>
+                <SidebarMenuSubButton asChild>
+                    <Link to={props.url ?? '#'}>
+                        <span>{props.title}</span>
+                    </Link>
+                </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+        )
 }
 
 function NavBarCollapsibleMenu(props: INavMenu) {
@@ -115,6 +117,7 @@ function NavBarCollapsibleMenu(props: INavMenu) {
                             {props.items?.map((subItem) => (
                                 subItem?.items?.length ?
                                     (<NavBarCollapsibleMenu {...subItem} />) :
+                                    subItem.isMeuItem &&
                                     (<SidebarMenuSubItem key={subItem.title}>
                                         <SidebarMenuSubButton asChild>
                                             <Link to={subItem.url ?? '#'}>
