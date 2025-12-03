@@ -25,6 +25,10 @@ export function createDragColumn<TData = any>(): ColumnDef<TData> {
     id: "drag",
     header: () => null,
     cell: ({ row }) => <DragHandle id={(row.original as any)?.id || row.id} />,
+    size: 40,
+    minSize: 40,
+    maxSize: 40,
+    enableResizing: false,
   }
 }
 
@@ -51,6 +55,9 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
     enableSorting: false,
     enableHiding: false,
     size: 40,
+    minSize: 40,
+    maxSize: 40,
+    enableResizing: false,
   }
 }
 
