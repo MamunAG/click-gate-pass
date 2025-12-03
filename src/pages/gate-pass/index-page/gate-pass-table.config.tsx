@@ -89,18 +89,33 @@ export const gatePassBulkActions: BulkAction<IGatePassIndex>[] = [
     label: "Export Selected",
     icon: Download,
     onClick: (selectedRows) => {
-      // Export logic
-      const csv = selectedRows
-        .map(row => `${row.date}, ${row.createdBy},${row.refNo},${row.type},${row.status}, ${row.aprvBy}`)
-        .join('\n')
+      // CSV Header
+      const headers = ["Date", "Created By", "Ref No", "Type", "Org Supplier", "Status", "Approved By"]
+      const headerRow = headers.join(",")
       
-      const blob = new Blob([csv], { type: 'text/csv' })
+      // CSV Data Rows
+      const dataRows = selectedRows
+        .map(row => [
+          `"${row.date}"`,
+          `"${row.createdBy}"`,
+          `"${row.refNo}"`,
+          `"${row.type}"`,
+          `"${row.orgSupplier}"`,
+          `"${row.status}"`,
+          `"${row.aprvBy}"`,
+        ].join(","))
+        .join("\n")
+      
+      const csv = `${headerRow}\n${dataRows}`
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
       const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'gate-pass-export.csv'
-      a.click()
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `gate-pass-export-${new Date().toISOString().split("T")[0]}.csv`
+      link.click()
       
+      // Cleanup
+      URL.revokeObjectURL(url)
       console.log(`Exported ${selectedRows.length} gate passes`)
     },
   },
