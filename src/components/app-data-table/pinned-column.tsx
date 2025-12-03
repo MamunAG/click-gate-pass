@@ -26,16 +26,20 @@ export const usePinningStyles = () => {
     
     return {
       backgroundColor: isPinned ? backgroundColor : undefined,
+      backgroundClip: isPinned ? "padding-box" : undefined,
       boxShadow: isLeftPinned
-        ? "4px 0 4px -4px rgba(0, 0, 0, 0.1)"
+        ? "2px 0 4px rgba(0, 0, 0, 0.1)"
         : isPinned === "right"
-        ? "-4px 0 4px -4px rgba(0, 0, 0, 0.1)"
+        ? "-2px 0 4px rgba(0, 0, 0, 0.1)"
         : undefined,
       left: isLeftPinned ? `${column.getStart("left")}px` : undefined,
       right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
       position: isPinned ? "sticky" : "relative",
       width: column.getSize(),
-      zIndex: isPinned ? 10 : 0,
+      minWidth: isPinned ? column.getSize() : undefined,
+      maxWidth: isPinned ? column.getSize() : undefined,
+      zIndex: isPinned ? 100 : 0,
+      borderRight: isLeftPinned && column.getIndex() === 2 ? "1px solid hsl(var(--border))" : undefined,
     };
   };
   
