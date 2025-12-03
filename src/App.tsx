@@ -10,6 +10,7 @@ import SignupPage from './pages/auth/signup/signup-index'
 import AuthProvider from './lib/auth-provider'
 import { AppMenu } from './pages/app-menu'
 import { INavMenu } from './components/nav-main'
+import PrivateRoute from './components/PrivateRoute'
 
 const queryClient = new QueryClient()
 function App() {
@@ -23,13 +24,15 @@ function App() {
                 <Route index element={<LoginPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
-                <Route path="/dashboard" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  {AppMenu.map(item => GetRoute(item))}
-                </Route>
-                <Route path="/win">
-                  <Route index element={<Home />} />
-                  {AppMenu.map(item => GetRoute(item))}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/dashboard" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    {AppMenu.map(item => GetRoute(item))}
+                  </Route>
+                  <Route path="/win">
+                    <Route index element={<Home />} />
+                    {AppMenu.map(item => GetRoute(item))}
+                  </Route>
                 </Route>
               </Route>
             </Routes>

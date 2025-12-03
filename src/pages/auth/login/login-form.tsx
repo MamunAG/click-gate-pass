@@ -28,16 +28,25 @@ export function LoginForm({
         username: "",
         password: "",
     });
-
+    const [isLoading, setIsLoading] = React.useState(false);
     const auth: AuthContextType | null = useAuth();
 
     const handleSubmitEvent = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (input.username !== "" && input.password !== "") {
-            await auth?.loginAction(input);
-            return;
+        try {
+
+            setIsLoading(true);
+
+            if (input.username !== "" && input.password !== "") {
+                await auth?.loginAction(input);
+                setIsLoading(false);
+                return;
+            }
+            alert("pleae provide a valid input");
+            setIsLoading(false);
+        } catch {
+            setIsLoading(false);
         }
-        alert("pleae provide a valid input");
     };
 
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +126,7 @@ export function LoginForm({
                                 />
                             </Field>
                             <Field>
-                                <Button type="submit">Login</Button>
+                                <Button type="submit" className="hover:cursor-pointer" disabled={isLoading}>Login</Button>
                                 <FieldDescription className="text-center">
                                     Don&apos;t have an account? <Link to="/signup">Sign up</Link>
                                 </FieldDescription>
