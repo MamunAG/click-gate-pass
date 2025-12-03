@@ -15,8 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import type { TableAction } from "./app-data-table"
 import { DragHandle } from "./drag-handle"
+import { TableAction } from "./types"
 
 // Column Creators
 
