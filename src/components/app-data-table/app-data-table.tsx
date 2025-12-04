@@ -190,7 +190,8 @@ export function AppDataTable<TData>({
       },
     },
   });
-  console.log("page size", serverPagination);
+  
+  console.log("Pagination:", serverPagination);
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(() => {
     if (!enableDragAndDrop) return [];

@@ -13,20 +13,19 @@ import { fetchGatePassData } from "./services/fakeGatePassApi";
 
 export default function GatePassIndex() {
   const [data, setData] = React.useState<IGatePassIndex[]>([]);
-  const [filterData, setFilterData] = React.useState<IGatePassIndex[]>([]);
+  const [filter, setFilter] = React.useState<formIndexType>({});
   const [loading, setLoading] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [total, setTotal] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
-  console.log(data);
-  // API Call - whenever page or limit changes
+
   React.useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const response = await fetchGatePassData(page, limit);
-        setData(response.data); // Only current page data
+        const response = await fetchGatePassData(page, limit, filter);
+        setData(response.data);
         setTotal(response.total);
         setTotalPages(response.totalPages);
       } catch (error) {
@@ -37,34 +36,15 @@ export default function GatePassIndex() {
     };
 
     loadData();
-  }, [page, limit]);
-
-  React.useEffect(() => {
-    // setData(GatePassData);
-    setFilterData(data);
-  }, [data]);
+  }, [page, limit, filter]);
 
   const setPageTitle = useAppStore((state) => state.setPageName);
   React.useEffect(() => {
     setPageTitle("Gate-pass");
   }, [setPageTitle]);
 
-  function handleIndexFormSubmit({
-    createdBy,
-    fromDate,
-    toDate,
-  }: formIndexType) {
-    let filterData = data;
-    if (createdBy) {
-      filterData = filterData.filter((_) => _.createdBy.includes(createdBy));
-    }
-    if (fromDate) {
-      filterData = filterData.filter((_) => new Date(_.date) >= fromDate);
-    }
-    if (toDate) {
-      filterData = filterData.filter((_) => new Date(_.date) <= toDate);
-    }
-    setFilterData(filterData);
+  function handleIndexFormSubmit(filterParams: formIndexType) {
+    setFilter(filterParams);
     setPage(1);
   }
 
@@ -80,7 +60,7 @@ export default function GatePassIndex() {
       </div>
       <div className="mt-5">
         <GatePassTable
-          data={filterData}
+          data={data}
           loading={loading}
           currentPage={page}
           pageSize={limit}
