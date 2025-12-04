@@ -31,6 +31,16 @@ export interface AppDataTableProps<TData = any> {
   pageSizeOptions?: number[];
   showPaginationInfo?: boolean;
 
+  // Server-side Pagination
+  serverPagination?: {
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (pageSize: number) => void;
+  };
+
   // Styling
   className?: string;
   tableClassName?: string;

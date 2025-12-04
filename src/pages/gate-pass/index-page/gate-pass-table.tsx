@@ -6,24 +6,53 @@ import {
   gatePassBulkActions,
 } from "./gate-pass-table.config";
 
-export function GatePassTable({ data }: { data: IGatePassIndex[] }) {
+interface GatePassTableProps {
+  data: IGatePassIndex[];
+  loading?: boolean;
+  currentPage: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (limit: number) => void;
+}
+
+export function GatePassTable({
+  data,
+  loading,
+  currentPage,
+  pageSize,
+  totalCount,
+  totalPages,
+  onPageChange,
+  onPageSizeChange,
+}: GatePassTableProps) {
   return (
     <AppDataTable
       data={data}
       columns={gatePassColumns}
+      rowActions={gatePassActions}
+      bulkActions={gatePassBulkActions}
       enableSelection={true}
       enableSorting={true}
       enableGlobalFilter={true}
-      enablePagination={true}
+      searchPlaceholder="Search gate passes..."
       enableColumnVisibility={true}
       enableDragAndDrop={true}
-      rowActions={gatePassActions}
-      bulkActions={gatePassBulkActions}
-      searchPlaceholder="Search gate passes..."
-      pageSize={10}
-      pageSizeOptions={[5, 10, 20, 50]}
+      enablePagination={true}
+      pageSize={pageSize}
+      pageSizeOptions={[2, 10, 20, 50]}
       enablePinning={true}
       pinnedColumnsCount={4}
+      isLoading={loading}
+      serverPagination={{
+        currentPage,
+        pageSize,
+        totalCount,
+        totalPages,
+        onPageChange,
+        onPageSizeChange
+      }}
     />
   );
 }

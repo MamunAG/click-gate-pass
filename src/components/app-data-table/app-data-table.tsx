@@ -83,6 +83,7 @@ export function AppDataTable<TData>({
   pageSize = 10,
   pageSizeOptions = [5, 10, 20, 50, 100],
   showPaginationInfo = true,
+  serverPagination,
   className,
   tableClassName,
   isLoading = false,
@@ -134,17 +135,19 @@ export function AppDataTable<TData>({
   // Auto-pin columns when enablePinning is true
   React.useEffect(() => {
     if (enablePinning && columns.length > 0) {
-      const columnIds = columns.slice(0, pinnedColumnsCount).map((col, index) => {
-        // Get the column id properly
-        if (typeof col.id === 'string') {
-          return col.id;
-        } else if ('accessorKey' in col && col.accessorKey) {
-          return String(col.accessorKey);
-        } else {
-          return `column-${index}`;
-        }
-      });
-      
+      const columnIds = columns
+        .slice(0, pinnedColumnsCount)
+        .map((col, index) => {
+          // Get the column id properly
+          if (typeof col.id === "string") {
+            return col.id;
+          } else if ("accessorKey" in col && col.accessorKey) {
+            return String(col.accessorKey);
+          } else {
+            return `column-${index}`;
+          }
+        });
+
       setColumnPinning({
         left: columnIds,
       });
@@ -161,9 +164,10 @@ export function AppDataTable<TData>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: enablePagination
-      ? getPaginationRowModel()
-      : undefined,
+    getPaginationRowModel:
+      enablePagination && !serverPagination
+        ? getPaginationRowModel()
+        : undefined,
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -171,6 +175,7 @@ export function AppDataTable<TData>({
     onGlobalFilterChange: setGlobalFilter,
     onColumnPinningChange: setColumnPinning,
     enableColumnPinning: enablePinning,
+    manualPagination: serverPagination ? true : false,
     state: {
       sorting,
       columnFilters,
@@ -181,10 +186,11 @@ export function AppDataTable<TData>({
     },
     initialState: {
       pagination: {
-        pageSize,
+        pageSize: serverPagination ? serverPagination.pageSize : pageSize,
       },
     },
   });
+  console.log("page size", serverPagination);
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(() => {
     if (!enableDragAndDrop) return [];
@@ -382,7 +388,7 @@ export function AppDataTable<TData>({
                     {row.getVisibleCells().map((cell) => {
                       const { column } = cell;
                       return (
-                        <TableCell 
+                        <TableCell
                           key={cell.id}
                           style={{ ...getCommonPinningStyles(column) }}
                         >
@@ -416,11 +422,34 @@ export function AppDataTable<TData>({
           {/* Selection Info */}
           {showPaginationInfo && (
             <div className="flex-1 text-sm text-muted-foreground">
-              {enableSelection && (
+              {serverPagination ? (
                 <>
-                  {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                  {table.getFilteredRowModel().rows.length} row(s) selected.
+                  Showing{" "}
+                  {(serverPagination.currentPage - 1) *
+                    serverPagination.pageSize +
+                    1}{" "}
+                  to{" "}
+                  {Math.min(
+                    serverPagination.currentPage * serverPagination.pageSize,
+                    serverPagination.totalCount
+                  )}{" "}
+                  of {serverPagination.totalCount} entries
+                  {enableSelection &&
+                    table.getFilteredSelectedRowModel().rows.length > 0 && (
+                      <>
+                        {" "}
+                        ({table.getFilteredSelectedRowModel().rows.length}{" "}
+                        selected)
+                      </>
+                    )}
                 </>
+              ) : (
+                enableSelection && (
+                  <>
+                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                  </>
+                )
               )}
             </div>
           )}
@@ -430,18 +459,32 @@ export function AppDataTable<TData>({
             <div className="flex items-center space-x-2">
               <p className="text-sm font-medium">Rows per page</p>
               <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => table.setPageSize(Number(value))}
+                value={`${
+                  serverPagination
+                    ? serverPagination.pageSize
+                    : table.getState().pagination.pageSize
+                }`}
+                onValueChange={(value) => {
+                  if (serverPagination) {
+                    serverPagination.onPageSizeChange(Number(value));
+                  } else {
+                    table.setPageSize(Number(value));
+                  }
+                }}
               >
                 <SelectTrigger className="h-8 w-[70px]">
                   <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
+                    placeholder={
+                      serverPagination
+                        ? serverPagination.pageSize
+                        : table.getState().pagination.pageSize
+                    }
                   />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {pageSizeOptions.map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
+                  {pageSizeOptions.map((size) => (
+                    <SelectItem key={size} value={`${size}`}>
+                      {size}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -450,7 +493,11 @@ export function AppDataTable<TData>({
 
             {/* Page Info */}
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {table.getPageCount() === 0
+              {serverPagination
+                ? serverPagination.totalPages === 0
+                  ? "No pages"
+                  : `Page ${serverPagination.currentPage} of ${serverPagination.totalPages}`
+                : table.getPageCount() === 0
                 ? "No pages"
                 : `Page ${
                     table.getState().pagination.pageIndex + 1
@@ -462,8 +509,18 @@ export function AppDataTable<TData>({
               <Button
                 variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
+                onClick={() => {
+                  if (serverPagination) {
+                    serverPagination.onPageChange(1);
+                  } else {
+                    table.setPageIndex(0);
+                  }
+                }}
+                disabled={
+                  serverPagination
+                    ? serverPagination.currentPage === 1
+                    : !table.getCanPreviousPage()
+                }
               >
                 <span className="sr-only">Go to first page</span>
                 {"<<"}
@@ -471,8 +528,20 @@ export function AppDataTable<TData>({
               <Button
                 variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
+                onClick={() => {
+                  if (serverPagination) {
+                    serverPagination.onPageChange(
+                      serverPagination.currentPage - 1
+                    );
+                  } else {
+                    table.previousPage();
+                  }
+                }}
+                disabled={
+                  serverPagination
+                    ? serverPagination.currentPage === 1
+                    : !table.getCanPreviousPage()
+                }
               >
                 <span className="sr-only">Go to previous page</span>
                 {"<"}
@@ -480,8 +549,21 @@ export function AppDataTable<TData>({
               <Button
                 variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
+                onClick={() => {
+                  if (serverPagination) {
+                    serverPagination.onPageChange(
+                      serverPagination.currentPage + 1
+                    );
+                  } else {
+                    table.nextPage();
+                  }
+                }}
+                disabled={
+                  serverPagination
+                    ? serverPagination.currentPage ===
+                      serverPagination.totalPages
+                    : !table.getCanNextPage()
+                }
               >
                 <span className="sr-only">Go to next page</span>
                 {">"}
@@ -489,8 +571,19 @@ export function AppDataTable<TData>({
               <Button
                 variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
+                onClick={() => {
+                  if (serverPagination) {
+                    serverPagination.onPageChange(serverPagination.totalPages);
+                  } else {
+                    table.setPageIndex(table.getPageCount() - 1);
+                  }
+                }}
+                disabled={
+                  serverPagination
+                    ? serverPagination.currentPage ===
+                      serverPagination.totalPages
+                    : !table.getCanNextPage()
+                }
               >
                 <span className="sr-only">Go to last page</span>
                 {">>"}
